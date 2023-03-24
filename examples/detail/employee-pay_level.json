@@ -1,0 +1,37 @@
+{
+    "source": {
+      "analyticObject": "Employee"
+    },
+    "columns": [
+      {
+        "columnDefinition": {
+          "property": {
+            "name": "Employee.Full_Name",
+            "qualifyingPath": "Employee"
+          }
+        }
+      },
+      {
+        "columnDefinition": {
+          "property": {
+            "name": "Employee.Pay_Level",
+            "qualifyingPath": "Employee"
+          }
+        }
+      }
+    ],
+    "filters": [
+      {
+        "selectionConcept": {
+          "name": "isFemale",
+          "qualifyingPath": "Employee"
+        }
+      }
+    ],
+    "timeInterval": {
+      "fromDateTime": "2020-10-01",
+      "intervalPeriodType": "MONTH",
+      "intervalPeriodCount": 1
+    }
+  }
+  

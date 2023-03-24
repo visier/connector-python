@@ -1,0 +1,48 @@
+{
+  "query": {
+    "source": {
+      "metric": "applicantCount"
+    },
+    "axes": [
+      {
+        "dimensionLevelSelection": {
+          "dimension" : {
+            "name": "Application_Source",
+            "qualifyingPath": "Applicant"
+          },
+          "levelIds": [
+            "Application_Source"
+          ]
+        }
+      },
+      {
+        "dimensionLevelSelection": {
+          "dimension" : {
+            "name": "Applicant_Stage",
+            "qualifyingPath": "Applicant"
+          },
+          "levelIds": [
+            "Applicant_Stage"
+          ]
+        }
+      }
+    ],
+    "filters": [
+      {
+        "selectionConcept": {
+          "name": "isActiveApplicant",
+          "qualifyingPath": "Applicant"
+        }
+      }
+    ],
+    "timeIntervals": {
+      "fromDateTime": "2020-10-01",
+      "intervalPeriodType": "MONTH",
+      "intervalPeriodCount": 3
+    }
+  },
+  "options": {
+    "zeroVisibility": "ELIMINATE",
+    "nullVisibility": "ELIMINATE"
+  }
+}

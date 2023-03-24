@@ -30,6 +30,7 @@ class ResultTable:
         self.header = json.loads(next(gen_f))
         self._generator = gen_f
 
+
     def rows(self):
         """Returns a row tuple generator"""
         for line in self._generator:
@@ -44,15 +45,41 @@ class VisierSession(object):
     """
     def __init__(self, auth: Authentication) -> None:
         self._auth = auth
+        self._session = None
 
 
-    def execute(self, sql_query: str, options = None):
+    def executeAggregate(self, query_def: object):
+        """Execute a Visier aggregate query and return a tabular result."""
+        url = self._auth.host + "/v1/data/query/aggregate"
+        return self._executeWithRetry(url, query_def)
+
+
+    def executeList(self, query_def: object):
+        """Execute a Visier list query and return a tabular result."""
+        url = self._auth.host + "/v1/data/query/list"
+        return self._executeWithRetry(url, query_def)
+
+
+    def executeSqlLike(self, sql_query: str, options = None):
         """Execute a Visier SQL-like query statement and return a tabular result."""
         url = self._auth.host + "/v1/data/query/sql"
         body = {"query" : sql_query}
         if options:
             body["options"] = options
+        return self._executeWithRetry(url, body)
 
+
+    def __enter__(self):
+        self._connect()
+        return self
+
+
+    def __exit__(self, ex_type, ex_value, trace_back):
+        self._close()
+
+
+    def _executeWithRetry(self, url: str, body: object):
+        """Generic method for executing a query and retrying if necessary."""
         num_attempts_left = 2
         is_ok = False
         while not is_ok and num_attempts_left > 0:
@@ -66,12 +93,6 @@ class VisierSession(object):
                     raise QueryExecutionError(r.status_code, r.text)
         return ResultTable(r.iter_lines())
 
-    def __enter__(self):
-        self._connect()
-        return self
-
-    def __exit__(self, ex_type, ex_value, trace_back):
-        self._close()
 
     def _connect(self):
         url = self._auth.host + "/v1/admin/visierSecureToken"
