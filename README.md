@@ -14,10 +14,11 @@ The connector acts as middleware between your (typically Pandas-enabled) Python 
 This connector was authored with [Pandas](https://pandas.pydata.org/) in mind.
 
 A small set of example queries have been provided. Generally, Visier Query API queries fall into one of two categories:
-1. **Aggregate query** - As the name implies, these kinds of queries aggregate metric values. They do so along the axes defined for the query and they produce multi-dimensional cell sets by default, though by providing an `Accept` header whose first value is either `application/jsonlines` or `text/csv`, the server will flatten the cell set into a tabular format when building the response.
 1. **Detail query** - These queries produce tabular results from underlying individual 'Analytic Objects'. The shape of the result is inherently tabular with each table attribute represented as a column in the result set. Detail queries are often referred to as `list` or even `drill-through` queries. They all mean the same thing; a detailed, i.e. non-aggregated, view of the underlying analytical objects.
+1. **Aggregate query** - As the name implies, these kinds of queries aggregate metric values. They do so along the axes defined for the query and they produce multi-dimensional cell sets by default, though by providing an `Accept` header whose first value is either `application/jsonlines` or `text/csv`, the server will flatten the cell set into a tabular format when building the response.
 
 Visier also offers an experimental alternative to the JSON-based query definitions: SQL-like. As the alluded to by the name, this allows for queries using a language that comes close to SQL and is generally are more compact and intuitive query representation. SQL-like alllows definition of both aggregate as well as detail queries
+
 :warning: SQL-like is in alpha stage and not suitable for use in production yet. Query feature-wise SQL-like is a proper subset with currently active development to close the parity gap.
 
 Example queries are provided through individual files. This is merely for convenience. SQL-like, being simple strings, can easily be defined close the query call itself.
@@ -36,6 +37,18 @@ auth = Authentication(
     api_key = os.getenv("SOME_APIKEY"))
 ```
 
+### Detail Query
+This is an example of a snippet that may be added to e.g. a Jupyter Notebook that loads detailed data. Detailed data is essentially granular, i.e. non-aggregated, data from Visier entities, e.g. Subjects such as `Employee` or Events such as `Compensation_Payout`.
+```python
+# List query from JSON query definition
+list_query = load_json("detail/employee-pay_level.json")
+list_result = s.executeList(list_query)
+df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
+
+# ...
+print(df_list.head)
+```
+
 ### Aggregate Query
 Aggregate queries, in contrast, executes queries around Visier's predefined Metrics. A Metric is an arbitrarily complex calculation that targets a specific quantifiable question or scenario. They range from very simple like `employeeCount` to more complex ones like `hrRecruitingBudgetedLaborCostPerFTE`. 
 
@@ -50,20 +63,20 @@ df_aggregate = pd.DataFrame.from_records(data=aggregate_result.rows(), columns=a
 print(df_aggregate.head)
 ```
 
-### Detail Query
-This is an example of a snippet that may be added to e.g. a Jupyter Notebook that loads detailed data. Detailed data is essentially granular, i.e. non-aggregated, data from Visier entities, e.g. Subjects such as `Employee` or Events such as `Compensation_Payout`.
+### SQL-like Queries
+SQL-like allows definition of both aggregate as well as detail queries:
+
+#### Detail Query
 ```python
-# List query from JSON query definition
-list_query = load_json("detail/employee-pay_level.json")
-list_result = s.executeList(list_query)
+# SQL-like detail query
+sql_detail_query = load_str("sql-like/detail/employee-demo.sql")
+list_result = s.executeSqlLike(sql_detail_query)
 df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
 
 # ...
 print(df_list.head)
 ```
 
-### SQL-like Queries
-SQL-like allows definition of both aggregate as well as detail queries:
 #### Aggregate Query
 This example shows, in addition the query definition itself, how the `options` object can be used to aggressively eliminate zero and null-valued cells for the purpose of reducing the size of the overall result set to only include rows whose metric value > 0.
 ```python
@@ -75,17 +88,6 @@ df_aggregate = pd.DataFrame.from_records(data=aggregate_result.rows(), columns=a
 
 # ...
 print(df_aggregate.head)
-```
-
-#### Detail Query
-```python
-# SQL-like detail query
-sql_detail_query = load_str("sql-like/detail/employee-demo.sql")
-list_result = s.executeSqlLike(sql_detail_query)
-df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
-
-# ...
-print(df_list.head)
 ```
 
 ## Installation
