@@ -41,25 +41,25 @@ Aggregate queries, in contrast, executes queries around Visier's predefined Metr
 
 With a `VisierSession` available, an aggregate query is executed functionally identically:
 ```python
-    # Aggregate query from JSON query definition
-    aggregate_query = load_json("aggregate/applicants-source.json")
-    aggregate_result = s.executeAggregate(aggregate_query)
-    df_aggregate = pd.DataFrame.from_records(data=aggregate_result.rows(), columns=aggregate_result.header)
+# Aggregate query from JSON query definition
+aggregate_query = load_json("aggregate/applicants-source.json")
+aggregate_result = s.executeAggregate(aggregate_query)
+df_aggregate = pd.DataFrame.from_records(data=aggregate_result.rows(), columns=aggregate_result.header)
 
-    # Now that the data is in a Pandas Data Frame, do something with it, or just...
-    print(df_aggregate.head)
+# Now that the data is in a Pandas Data Frame, do something with it, or just...
+print(df_aggregate.head)
 ```
 
 ### Detail Query
 This is an example of a snippet that may be added to e.g. a Jupyter Notebook that loads detailed data. Detailed data is essentially granular, i.e. non-aggregated, data from Visier entities, e.g. Subjects such as `Employee` or Events such as `Compensation_Payout`.
 ```python
-    # List query from JSON query definition
-    list_query = load_json("detail/employee-pay_level.json")
-    list_result = s.executeList(list_query)
-    df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
+# List query from JSON query definition
+list_query = load_json("detail/employee-pay_level.json")
+list_result = s.executeList(list_query)
+df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
 
-    # ...
-    print(df_list.head)
+# ...
+print(df_list.head)
 ```
 
 ### SQL-like Queries
@@ -67,25 +67,25 @@ SQL-like allows definition of both aggregate as well as detail queries:
 #### Aggregate Query
 This example shows, in addition the query definition itself, how the `options` object can be used to aggressively eliminate zero and null-valued cells for the purpose of reducing the size of the overall result set to only include rows whose metric value > 0.
 ```python
-    # SQL-like aggregate query
-    sql_aggregate_query = load_str("sql-like/aggregate/employee-count.sql")
-    sparse_options = load_json("sql-like/options/sparse.json")
-    aggregate_result = s.executeSqlLike(sql_aggregate_query, sparse_options)
-    df_aggregate = pd.DataFrame.from_records(data=aggregate_result.rows(), columns=aggregate_result.header)
+# SQL-like aggregate query
+sql_aggregate_query = load_str("sql-like/aggregate/employee-count.sql")
+sparse_options = load_json("sql-like/options/sparse.json")
+aggregate_result = s.executeSqlLike(sql_aggregate_query, sparse_options)
+df_aggregate = pd.DataFrame.from_records(data=aggregate_result.rows(), columns=aggregate_result.header)
 
-    # ...
-    print(df_aggregate.head)
+# ...
+print(df_aggregate.head)
 ```
 
 #### Detail Query
 ```python
-    # SQL-like detail query
-    sql_detail_query = load_str("sql-like/detail/employee-demo.sql")
-    list_result = s.executeSqlLike(sql_detail_query)
-    df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
+# SQL-like detail query
+sql_detail_query = load_str("sql-like/detail/employee-demo.sql")
+list_result = s.executeSqlLike(sql_detail_query)
+df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
 
-    # ...
-    print(df_list.head)
+# ...
+print(df_list.head)
 ```
 
 ## Installation
