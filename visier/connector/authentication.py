@@ -1,5 +1,10 @@
+"""
+Basic Authentication class for Visier Connector
+"""
+import dataclasses
 
-class Authentication(object):
+@dataclasses.dataclass
+class Authentication:
     """
     Authentication configuration definition
     
@@ -18,7 +23,10 @@ class Authentication(object):
             api_key: str,
             host: str,
             vanity: str = None) -> None:
-        # TODO check for None and throw as necessary
+        if not username or not password or not api_key or not host:
+            raise ValueError("""ERROR: Missing required credentials.
+            Please provide username, password, api_key, and host.""")
+
         self.vanity = vanity
         self.host = host
         self.api_key = api_key
