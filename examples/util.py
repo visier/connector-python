@@ -1,10 +1,14 @@
+"""
+    Utility functions for loading JSON and text files from the examples directory.
+"""
+
 import json
 import os
 
 
 def load_json(path: str) -> dict:
     """Load a JSON file and return the contents as a dictionary."""
-    return _load_from_path(path, lambda f: json.load(f))
+    return _load_from_path(path, json.load)
 
 
 def load_str(path: str) -> str:
@@ -16,5 +20,5 @@ def _load_from_path(path: str, func: callable) -> object:
     """Load a file and return the contents as an object."""
     if not path.startswith("examples/"):
         path = os.path.join("examples", path)
-    with open(path) as f:
-        return func(f)
+    with open(path, encoding="UTF-8") as spec_file:
+        return func(spec_file)
