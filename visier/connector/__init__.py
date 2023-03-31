@@ -3,10 +3,8 @@
 # flake8: noqa
 
 """
-    Visier Public Python Connection
+    Visier Public Python Connector
 """
 
-__version__ = "0.0.1"
-
 from .authentication import Authentication
-from .sessions import VisierSession
+from .sessions import VisierSession, ResultTable, QueryExecutionError
