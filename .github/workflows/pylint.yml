@@ -3,7 +3,7 @@ name: Pylint
 on: [push]
 
 jobs:
-  build:
+  python-linter:
     runs-on: ubuntu-latest
     strategy:
       matrix:

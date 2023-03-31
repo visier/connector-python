@@ -3,12 +3,11 @@
 """
     Visier Python Connector
 """
-import os
 from setuptools import setup, find_packages  # noqa: H301
-
+import visier
 
 NAME = "visier-connector"
-VERSION = os.getenv("VERSION")
+VERSION = visier.__version__
 
 # To install the library, run the following
 #
@@ -35,7 +34,11 @@ setup(
     include_package_data=True,
     license="Apache License, Version 2.0",
     long_description="""\
-    Simple Python Connector to simplify ingesting Visier People data into Python Frameworks like Pandas.
-      Queries are submitted in SQL-like form.  # noqa: E501
+    Simple Python Connector to simplify ingesting Visier People data into Python Frameworks like Pandas,
+    though it can be used for any other purpose.
+    The connector provides functions that enable execution of:
+    * SQL-like queries
+    * Aggregate queries
+    * List, aka Detail, queries
     """
 )
