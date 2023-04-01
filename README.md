@@ -1,4 +1,4 @@
-![Pylint](https://github.com/visier/visier-connector-python/.github/workflows/pylint.yml/badge.svg) ![Pypi publishing](https://github.com/visier/visier-connector-python/.github/workflows/publish-to-test-pypi.yml/badge.svg)
+[![Pylint](https://github.com/visier/visier-connector-python/actions/workflows/pylint.yml/badge.svg)] [![Pypi publishing](https://github.com/visier/visier-connector-python/actions/workflows/publish-to-test-pypi.yml/badge.svg)[
 # Visier Python Connector
 Use the Visier Python Connector to query Visier People Data.
 
