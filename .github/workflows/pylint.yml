@@ -1,9 +1,9 @@
 name: Pylint
 
-on: [push]
+on: [workflow_call]
 
 jobs:
-  python-linter:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
