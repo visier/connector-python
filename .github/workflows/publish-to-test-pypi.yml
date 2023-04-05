@@ -1,9 +1,9 @@
 name: pypi publish
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
+    tags:
+      - v**
 
 jobs:
   build-n-publish:
@@ -30,11 +30,6 @@ jobs:
         --wheel
         --outdir dist/
         .
-    - name: test publish
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository-url: https://test.pypi.org/legacy/
     - name: prod publish
       if: startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@release/v1
