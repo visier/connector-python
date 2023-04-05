@@ -1,11 +1,11 @@
-name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+name: pypi publish
 
 on: [push]
 jobs:
   pylint:
     uses: ./.github/workflows/pylint.yml
   build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+    name: pypi publish
     runs-on: ubuntu-latest
     needs: [pylint]
     steps:
@@ -28,12 +28,12 @@ jobs:
         --wheel
         --outdir dist/
         .
-    - name: Publish distribution 📦 to Test PyPI
+    - name: test publish
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository-url: https://test.pypi.org/legacy/
-    - name: Publish distribution 📦 to PyPI
+    - name: prod publish
       if: startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
