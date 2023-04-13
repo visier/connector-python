@@ -17,8 +17,9 @@ Visier Session object through which JSON as well as SQL-like queries are execute
 
 import json
 import dataclasses
+from typing import Callable
 import requests
-from requests import Session
+from requests import Session, Response
 from visier.connector.authentication import Authentication
 
 
@@ -70,18 +71,15 @@ class VisierSession:
         self._auth = auth
         self._session = None
 
-
     def execute_aggregate(self, query_def: object):
         """Execute a Visier aggregate query and return a tabular result."""
         url = self._auth.host + "/v1/data/query/aggregate"
-        return self._execute_with_retry(url, query_def)
-
+        return self._execute_query_api(url, query_def)
 
     def execute_list(self, query_def: object):
         """Execute a Visier list query and return a tabular result."""
         url = self._auth.host + "/v1/data/query/list"
-        return self._execute_with_retry(url, query_def)
-
+        return self._execute_query_api(url, query_def)
 
     def execute_sqllike(self, sql_query: str, options = None):
         """Execute a Visier SQL-like query statement and return a tabular result."""
@@ -89,24 +87,19 @@ class VisierSession:
         body = {"query" : sql_query}
         if options:
             body["options"] = options
-        return self._execute_with_retry(url, body)
+        return self._execute_query_api(url, body)
 
+    def execute(self, call_function: Callable[[Session], Response]) -> Response:
+        """Execute a custom function with the current session.
 
-    def __enter__(self):
-        self._connect()
-        return self
-
-
-    def __exit__(self, ex_type, ex_value, trace_back):
-        self._close()
-
-
-    def _execute_with_retry(self, url: str, body: object):
-        """Generic method for executing a query and retrying if necessary."""
+        Keyword arguments:
+        call_function -- Function that takes a Session object as input and
+                         returns a Response object.
+        """
         num_attempts_left = 2
         is_ok = False
         while not is_ok and num_attempts_left > 0:
-            result = self._session.post(url=url, json=body, headers=self.HEADER)
+            result = call_function(self._session)
             num_attempts_left -= 1
             is_ok = result.ok
             if not is_ok:
@@ -114,8 +107,19 @@ class VisierSession:
                     self._connect()
                 else:
                     raise QueryExecutionError(result.status_code, result.text)
-        return ResultTable(result.iter_lines())
+        return result
 
+    def __enter__(self):
+        self._connect()
+        return self
+
+    def __exit__(self, ex_type, ex_value, trace_back):
+        self._close()
+
+    def _execute_query_api(self, url: str, body: object):
+        """Helper method for executing a query API with flattened result."""
+        result = self.execute(lambda s: s.post(url=url, json=body, headers=self.HEADER))
+        return ResultTable(result.iter_lines())
 
     def _connect(self):
         url = self._auth.host + "/v1/admin/visierSecureToken"
@@ -130,7 +134,6 @@ class VisierSession:
         self._session = Session()
         self._session.cookies["VisierASIDToken"] = asid_token
         self._session.headers.update({"apikey": self._auth.api_key})
-
 
     def _close(self):
         self._session.close()
