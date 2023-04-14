@@ -59,6 +59,22 @@ class ResultTable:
             yield json.loads(line)
 
 
+class SessionContext:
+    """
+    Context object passed to the user-defined function in the execute() method.
+    """
+    def __init__(self, session: Session, host: str) -> None:
+        self._session = session
+        self._host = host
+
+    def session(self) -> Session:
+        """Returns the current session object"""
+        return self._session
+
+    def mk_url(self, path: str) -> str:
+        """Returns a URL for the given path"""
+        return self._host + path
+
 class VisierSession:
     """Visier Session object through which SQL-like queries are executed.
     
@@ -73,33 +89,31 @@ class VisierSession:
 
     def execute_aggregate(self, query_def: object):
         """Execute a Visier aggregate query and return a tabular result."""
-        url = self._auth.host + "/v1/data/query/aggregate"
-        return self._execute_query_api(url, query_def)
+        return self._execute_query_api("/v1/data/query/aggregate", query_def)
 
     def execute_list(self, query_def: object):
         """Execute a Visier list query and return a tabular result."""
-        url = self._auth.host + "/v1/data/query/list"
-        return self._execute_query_api(url, query_def)
+        return self._execute_query_api("/v1/data/query/list", query_def)
 
     def execute_sqllike(self, sql_query: str, options = None):
         """Execute a Visier SQL-like query statement and return a tabular result."""
-        url = self._auth.host + "/v1/data/query/sql"
         body = {"query" : sql_query}
         if options:
             body["options"] = options
-        return self._execute_query_api(url, body)
+        return self._execute_query_api("/v1/data/query/sql", body)
 
-    def execute(self, call_function: Callable[[Session], Response]) -> Response:
+    def execute(self, call_function: Callable[[SessionContext], Response]) -> Response:
         """Execute a custom function with the current session.
 
         Keyword arguments:
-        call_function -- Function that takes a Session object as input and
+        call_function -- Function that takes a SessionContext object as input and
                          returns a Response object.
         """
         num_attempts_left = 2
         is_ok = False
+        context = SessionContext(self._session, self._auth.host)
         while not is_ok and num_attempts_left > 0:
-            result = call_function(self._session)
+            result = call_function(context)
             num_attempts_left -= 1
             is_ok = result.ok
             if not is_ok:
@@ -116,9 +130,11 @@ class VisierSession:
     def __exit__(self, ex_type, ex_value, trace_back):
         self._close()
 
-    def _execute_query_api(self, url: str, body: object):
+    def _execute_query_api(self, path: str, body: object):
         """Helper method for executing a query API with flattened result."""
-        result = self.execute(lambda s: s.post(url=url, json=body, headers=self.HEADER))
+        result = self.execute(lambda s: s.session().post(url=s.mk_url(path),
+                                                         json=body,
+                                                         headers=self.HEADER))
         return ResultTable(result.iter_lines())
 
     def _connect(self):
