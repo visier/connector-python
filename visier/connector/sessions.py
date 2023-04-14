@@ -147,9 +147,7 @@ class VisierSession:
         result.raise_for_status()
 
         # Only create a requests.Session once we have a Visier ASID Token
-        # asid_token = result.text
-        print("DEBUG: actual token disregarded. Use expired DSC D3M token instead.")
-        asid_token = os.getenv("DEBUG_TOKEN")
+        asid_token = result.text
         self._session = Session()
         self._session.cookies["VisierASIDToken"] = asid_token
         self._session.headers.update({"apikey": self._auth.api_key})
