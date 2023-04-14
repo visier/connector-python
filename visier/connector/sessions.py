@@ -15,7 +15,6 @@
 Visier Session object through which JSON as well as SQL-like queries are executed.
 """
 
-import os
 import json
 import dataclasses
 from typing import Callable
