@@ -24,7 +24,7 @@ Visier also offers an experimental alternative to the JSON-based query definitio
 
 Example queries are provided through individual _files_. This is merely for convenience. SQL-like, being simple strings, can easily be provided to the call itself.
 
-In order to reduce duplication, each provided sample below should be preceded by the necessary `import`s as well as authentication credential definition:
+In order to reduce duplication, each provided sample below should be preceded by the necessary `import` statements as well as authentication credential definition:
 ```python
 import os
 from visier.connector import Authentication, VisierSession

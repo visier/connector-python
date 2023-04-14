@@ -15,6 +15,7 @@
 Visier Session object through which JSON as well as SQL-like queries are executed.
 """
 
+import os
 import json
 import dataclasses
 from typing import Callable
@@ -111,8 +112,8 @@ class VisierSession:
         """
         num_attempts_left = 2
         is_ok = False
-        context = SessionContext(self._session, self._auth.host)
         while not is_ok and num_attempts_left > 0:
+            context = SessionContext(self._session, self._auth.host)
             result = call_function(context)
             num_attempts_left -= 1
             is_ok = result.ok
@@ -146,7 +147,9 @@ class VisierSession:
         result.raise_for_status()
 
         # Only create a requests.Session once we have a Visier ASID Token
-        asid_token = result.text
+        # asid_token = result.text
+        print("DEBUG: actual token disregarded. Use expired DSC D3M token instead.")
+        asid_token = os.getenv("DEBUG_TOKEN")
         self._session = Session()
         self._session.cookies["VisierASIDToken"] = asid_token
         self._session.headers.update({"apikey": self._auth.api_key})
