@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "visier-connector-python"
+name = "visier-connector"
 authors = [
     {name = "Visier Research & Development", email = "info@visier.com"},
 ]
