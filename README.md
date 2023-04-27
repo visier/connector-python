@@ -46,7 +46,7 @@ This is an example of a snippet that may be added to something that loads detail
 with VisierSession(auth) as s:
     # List query from JSON query definition
     list_query = load_json("detail/employee-pay_level.json")
-    list_result = s.executeList(list_query)
+    list_result = s.execute_list(list_query)
     df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
 
     # ...
@@ -61,7 +61,7 @@ With a `VisierSession` available, an aggregate query is executed functionally id
 with VisierSession(auth) as s:
     # Aggregate query from JSON query definition
     aggregate_query = load_json("aggregate/applicants-source.json")
-    aggregate_result = s.executeAggregate(aggregate_query)
+    aggregate_result = s.execute_aggregate(aggregate_query)
     df_aggregate = pd.DataFrame.from_records(data=aggregate_result.rows(), columns=aggregate_result.header)
 
     # Now that the data is in a Pandas Data Frame, do something with it, or just...
@@ -76,7 +76,7 @@ SQL-like allows definition of both aggregate as well as detail queries:
 with VisierSession(auth) as s:
     # SQL-like detail query
     sql_detail_query = load_str("sql-like/detail/employee-demo.sql")
-    list_result = s.executeSqlLike(sql_detail_query)
+    list_result = s.execute_sqllike(sql_detail_query)
     df_list = pd.DataFrame.from_records(data=list_result.rows(), columns=list_result.header)
 
     # ...
@@ -90,11 +90,23 @@ with VisierSession(auth) as s:
     # SQL-like aggregate query
     sql_aggregate_query = load_str("sql-like/aggregate/employee-count.sql")
     sparse_options = load_json("sql-like/options/sparse.json")
-    aggregate_result = s.executeSqlLike(sql_aggregate_query, sparse_options)
+    aggregate_result = s.execute_sqllike(sql_aggregate_query, sparse_options)
     df_aggregate = pd.DataFrame.from_records(data=aggregate_result.rows(), columns=aggregate_result.header)
 
     # ...
     print(df_aggregate.head)
+```
+
+### Any Visier public API
+While connector provides specific functions for querying data, it also provides a lower level, generic function for executing other public Visier APIs. Below is a simple example for determining dimension metadata, including the names of the levels.
+```python
+def get_location_levels(context: SessionContext) -> Response:
+    path = "/v1/data/model/analytic-objects/Employee/dimensions/Location"
+    return context.session().get(url=context.mk_url(path))
+
+with VisierSession(auth) as s:
+    levels = s.execute(get_location_levels)
+    print(levels.json())
 ```
 
 ## Installation
