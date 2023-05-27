@@ -18,6 +18,7 @@ Visier Session object through which JSON as well as SQL-like queries are execute
 import requests
 from typing import Callable
 from requests import Session, Response
+from deprecated import deprecated
 from .authentication import Authentication
 from visier.connector.table import ResultTable
 
@@ -67,14 +68,17 @@ class VisierSession:
         self._auth = auth
         self._session = None
 
+    @deprecated(version="0.9.5", reason="Use visier.api.QueryApiClient instead")
     def execute_aggregate(self, query_def: object):
         """Execute a Visier aggregate query and return a tabular result."""
         return self._execute_query_api("/v1/data/query/aggregate", query_def)
 
+    @deprecated(version="0.9.5", reason="Use visier.api.QueryApiClient instead")
     def execute_list(self, query_def: object):
         """Execute a Visier list query and return a tabular result."""
         return self._execute_query_api("/v1/data/query/list", query_def)
 
+    @deprecated(version="0.9.5", reason="Use visier.api.QueryApiClient instead")
     def execute_sqllike(self, sql_query: str, options = None):
         """Execute a Visier SQL-like query statement and return a tabular result."""
         body = {"query" : sql_query}
