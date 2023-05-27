@@ -1,4 +1,5 @@
 {
     "zeroVisibility": "ELIMINATE",
-    "nullVisibility": "ELIMINATE"
+    "nullVisibility": "ELIMINATE",
+    "memberDisplayMode": "COMPACT"
 }

@@ -15,15 +15,12 @@
 Visier Session object through which JSON as well as SQL-like queries are executed.
 """
 
-import json
-import dataclasses
-from typing import Callable
 import requests
+from typing import Callable
 from requests import Session, Response
-from visier.connector.authentication import Authentication
+from .authentication import Authentication
+from visier.connector.table import ResultTable
 
-
-@dataclasses.dataclass
 class QueryExecutionError(Exception):
     """Description of error from executing a query"""
     def __init__(self, status_code, message) -> None:
@@ -31,33 +28,16 @@ class QueryExecutionError(Exception):
         HTTP status code: {status_code}
         The server returned the following description of the error:
         {message}""", )
-
-
-@dataclasses.dataclass
-class ResultTable:
-    """Tabular result set
-
-    Keyword args:
-    jsonlines -- JSON Lines representation of the entire result set.
-                 This is an array of strings, where each line will be
-                 parsed independently.
-
-    Class members:
-    header -- Array of column header strings.
-    rows() -- Row tuple generator
-    """
-    header = []
-
-    def __init__(self, gen_f) -> None:
-        self.header = json.loads(next(gen_f))
-        self._generator = gen_f
-
-
-    def rows(self):
-        """Returns a row tuple generator"""
-        for line in self._generator:
-            yield json.loads(line)
-
+        self._status_code = status_code
+        self._message = message
+    
+    def status_code(self) -> int:
+        """Returns the HTTP status code"""
+        return self._status_code
+    
+    def message(self) -> str:
+        """Returns the error message"""
+        return self._message
 
 class SessionContext:
     """
@@ -128,7 +108,7 @@ class VisierSession:
         return self
 
     def __exit__(self, ex_type, ex_value, trace_back):
-        self._close()
+        self.close()
 
     def _execute_query_api(self, path: str, body: object):
         """Helper method for executing a query API with flattened result."""
@@ -151,5 +131,6 @@ class VisierSession:
         self._session.cookies["VisierASIDToken"] = asid_token
         self._session.headers.update({"apikey": self._auth.api_key})
 
-    def _close(self):
+    def close(self):
+        """Close the session."""
         self._session.close()
