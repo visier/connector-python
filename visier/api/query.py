@@ -15,17 +15,13 @@
 API client for the Visier Query API.
 """
 
-from visier.connector import VisierSession
-from .base import ApiClientBase
 from visier.connector import ResultTable
+from .base import ApiClientBase
 
 
 class QueryApiClient(ApiClientBase):
     """API client for the Visier Query API."""
     HEADER = {"Accept": "application/jsonlines, application/json"}
-    
-    def __init__(self, session: VisierSession) -> None:
-        super().__init__(session)
 
     def aggregate(self, query_def: object):
         """Execute a Visier aggregate query and return a tabular result."""

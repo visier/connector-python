@@ -18,15 +18,12 @@ API client for the Visier Model API.
 from typing import List
 import urllib.parse as urlparse
 from requests import Response
-from visier.connector import VisierSession, SessionContext
+from visier.connector import SessionContext
 from .base import ApiClientBase
 
 
 class ModelApiClient(ApiClientBase):
     """API client for the Visier Model API."""
-    def __init__(self, session: VisierSession) -> None:
-        super().__init__(session)
-
     def get_analytic_objects(self, ids: List[str] = None) -> Response:
         """Get analytic objects by id"""
         def call_impl(context: SessionContext) -> Response:
@@ -50,7 +47,7 @@ class ModelApiClient(ApiClientBase):
             url = context.mk_url(f"/v1/data/model/analytic-objects/{object_id}/dimensions{args}")
             return context.session().get(url)
         return self.run(call_impl)
- 
+
     def get_selection_concepts(self, object_id: str, ids: List[str] = None) -> Response:
         """Get concepts by id"""
         def call_impl(context: SessionContext) -> Response:
@@ -73,5 +70,4 @@ def _ids_as_url_args(ids: List[str]) -> str:
     if (ids and len(ids) > 0):
         args = "&id=".join([urlparse.quote_plus(id) for id in ids])
         return f"?id={args}"
-    else:
-        return ""
+    return ""

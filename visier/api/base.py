@@ -36,7 +36,8 @@ class ApiClientBase(ABC):
             return response
         except QueryExecutionError as ex:
             self._last_error = f"Error. Message: {ex.message}. Status Code: {ex.status_code}."
-        
+            return None
+
     def last_error(self) -> str:
         """Returns the error from the msot recent API call or None if the call was successful"""
-        return self._visier_session or self._external_visier_session
+        return self._last_error

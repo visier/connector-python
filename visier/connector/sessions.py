@@ -15,12 +15,12 @@
 Visier Session object through which JSON as well as SQL-like queries are executed.
 """
 
-import requests
 from typing import Callable
+import requests
 from requests import Session, Response
 from deprecated import deprecated
+from .table import ResultTable
 from .authentication import Authentication
-from visier.connector.table import ResultTable
 
 class QueryExecutionError(Exception):
     """Description of error from executing a query"""
@@ -31,11 +31,11 @@ class QueryExecutionError(Exception):
         {message}""", )
         self._status_code = status_code
         self._message = message
-    
+
     def status_code(self) -> int:
         """Returns the HTTP status code"""
         return self._status_code
-    
+
     def message(self) -> str:
         """Returns the error message"""
         return self._message
