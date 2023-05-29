@@ -18,7 +18,7 @@ API client for the Visier Direct Intake API.
 import dataclasses
 import json
 from requests import Response
-from visier.connector import SessionContext
+from visier.connector import SessionContext, VisierSession
 from .base import ApiClientBase
 
 DRAFT_ID = "prod"
@@ -45,7 +45,7 @@ def _to_supplemental(is_supplemental: bool) -> str:
 
 class DirectIntakeApiClient(ApiClientBase):
     """API client for the Visier Direct Intake API."""
-
+    
     def set_configuration(self, configuration: Configuration) -> Response:
         """Set the configuration for the the direct intake environment.
         

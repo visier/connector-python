@@ -23,13 +23,24 @@ from visier.connector import VisierSession, QueryExecutionError, SessionContext
 
 class ApiClientBase(ABC):
     """Abstract base class for Visier API clients that abstract the VisierSession."""
-    def __init__(self, visier_session: VisierSession) -> None:
+    def __init__(self, visier_session: VisierSession, raise_on_error: bool = False) -> None:
+        """Construct an API Client.
+        
+        Arguments:
+        - visier_session: The VisierSession to use for API calls.
+        - raise_on_error: If True, raise an exception on API call errors. If False, return None with last_error populated."""
         super().__init__()
         self._visier_session = visier_session
+        self._raise_on_error = raise_on_error
         self._last_error = None
 
     def run(self, func: Callable[[SessionContext], Response]):
-        """Runs the provided function with the internal VisierSession"""
+        """Runs the provided function with the internal VisierSession.
+        
+        Arguments:
+        - func: The function to run. The function should take a SessionContext as an argument and return a Response."""
+        if self._raise_on_error:
+            return self._visier_session.execute(func)
         try:
             self._last_error = None
             response = self._visier_session.execute(func)
