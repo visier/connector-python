@@ -32,14 +32,6 @@ class ModelApiClient(ApiClientBase):
             return context.session().get(url)
         return self.run(call_impl)
 
-    def get_metrics(self, ids: List[str] = None) -> Response:
-        """Get metrics by id"""
-        def call_impl(context: SessionContext) -> Response:
-            args = _ids_as_url_args(ids)
-            url = context.mk_url(f"/v1/data/model/metrics{args}")
-            return context.session().get(url)
-        return self.run(call_impl)
-
     def get_dimensions(self, object_id: str, ids: List[str] = None) -> Response:
         """Get dimensions by id"""
         def call_impl(context: SessionContext) -> Response:
@@ -61,6 +53,28 @@ class ModelApiClient(ApiClientBase):
         def call_impl(context: SessionContext) -> Response:
             args = _ids_as_url_args(ids)
             url = context.mk_url(f"/v1/data/model/analytic-objects/{object_id}/properties{args}")
+            return context.session().get(url)
+        return self.run(call_impl)
+
+    def get_metrics(self, ids: List[str] = None) -> Response:
+        """Get metrics by id"""
+        def call_impl(context: SessionContext) -> Response:
+            args = _ids_as_url_args(ids)
+            url = context.mk_url(f"/v1/data/model/metrics{args}")
+            return context.session().get(url)
+        return self.run(call_impl)
+
+    def get_metric_dimensions(self, metric_id: str) -> Response:
+        """Get dimensions by id"""
+        def call_impl(context: SessionContext) -> Response:
+            url = context.mk_url(f"/v1/data/model/metrics/{metric_id}/dimensions")
+            return context.session().get(url)
+        return self.run(call_impl)
+
+    def get_metric_selection_concepts(self, metric_id: str) -> Response:
+        """Get concepts by id"""
+        def call_impl(context: SessionContext) -> Response:
+            url = context.mk_url(f"/v1/data/model/metrics/{metric_id}/selection-concepts")
             return context.session().get(url)
         return self.run(call_impl)
 
