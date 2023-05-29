@@ -16,9 +16,8 @@ API client for the Visier Direct Intake API.
 """
 
 import dataclasses
-import json
 from requests import Response
-from visier.connector import SessionContext, VisierSession
+from visier.connector import SessionContext
 from .base import ApiClientBase
 
 DRAFT_ID = "prod"
@@ -26,15 +25,11 @@ BASE_PATH = f"/v1/data/directloads/{DRAFT_ID}"
 
 @dataclasses.dataclass
 class Configuration:
-    config = {}
     """Configuration for a Direct Intake environment."""
+    config = {}
     def __init__(self, is_supplemental: bool = None) -> None:
         self.config = {"job":{"supplementalMode": _to_supplemental(is_supplemental)}}
 
-    # def config(self) -> dict:
-    #     """Returns the configuration as a dictionary."""
-    #     return self._config
-    
 def _to_supplemental(is_supplemental: bool) -> str:
     if is_supplemental is None:
         return "UNCHANGED"
@@ -45,7 +40,7 @@ def _to_supplemental(is_supplemental: bool) -> str:
 
 class DirectIntakeApiClient(ApiClientBase):
     """API client for the Visier Direct Intake API."""
-    
+
     def set_configuration(self, configuration: Configuration) -> Response:
         """Set the configuration for the the direct intake environment.
         
