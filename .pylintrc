@@ -1,2 +1,4 @@
 [MASTER]
 max-args = 6
+max-line-length = 140
+disable = R0801

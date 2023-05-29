@@ -15,6 +15,7 @@ license = {file = "LICENSE"}
 dynamic = ["version"]
 dependencies = [
     "requests >= 2.28",
+    "deprecated",
 ]
 
 [tool.poetry]

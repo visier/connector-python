@@ -12,7 +12,9 @@
 # along with visier-connector-python. If not, see <https://www.apache.org/licenses/LICENSE-2.0>.
 
 """
-Visier Public Python Connector
+Visier API Bindings that enable calling the Visier APIs through the VisierSession.
 """
 
-__version__ = "0.9.5"
+from .model import ModelApiClient
+from .query import QueryApiClient
+from .direct_intake import Configuration, DirectIntakeApiClient
