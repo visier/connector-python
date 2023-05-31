@@ -88,7 +88,7 @@ class DirectIntakeApiClient(ApiClientBase):
         Arguments:
         - transaction_id: The transaction id returned by start_transaction"""
         def call_impl(context: SessionContext) -> Response:
-            url = context.mk_url(f"{BASE_PATH}/transactions/{transaction_id}/")
+            url = context.mk_url(f"{BASE_PATH}/transactions/{transaction_id}")
             return context.session().delete(url)
         return self.run(call_impl)
 
