@@ -14,7 +14,7 @@ keywords = ["visier", "data", "query", "connector", "api"]
 license = {file = "LICENSE"}
 dynamic = ["version"]
 dependencies = [
-    "requests >= 2.28",
+    "requests >= 2.31",
     "deprecated",
 ]
 
