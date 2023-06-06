@@ -12,7 +12,7 @@
 # along with visier-connector-python. If not, see <https://www.apache.org/licenses/LICENSE-2.0>.
 
 """
-Visier Public Python Connector
+Visier Public Python Connector Constants
 """
 
-__version__ = "0.9.7"
+TARGET_TENANT_ID="TargetTenantID"

@@ -21,6 +21,8 @@ from requests import Session, Response
 from deprecated import deprecated
 from .table import ResultTable
 from .authentication import Authentication
+from .constants import TARGET_TENANT_ID
+
 
 class QueryExecutionError(Exception):
     """Description of error from executing a query"""
@@ -40,13 +42,15 @@ class QueryExecutionError(Exception):
         """Returns the error message"""
         return self._message
 
+
 class SessionContext:
     """
     Context object passed to the user-defined function in the execute() method.
     """
-    def __init__(self, session: Session, host: str) -> None:
+    def __init__(self, session: Session, host: str, target_tenant_id: str = None) -> None:
         self._session = session
         self._host = host
+        self._target_tenant_id = target_tenant_id
 
     def session(self) -> Session:
         """Returns the current session object"""
@@ -55,6 +59,15 @@ class SessionContext:
     def mk_url(self, path: str) -> str:
         """Returns a URL for the given path"""
         return self._host + path
+
+    def mk_headers(self, headers: dict = None) -> dict:
+        """Returns the headers for the current request"""
+        if headers is None:
+            headers = {}
+        if self._target_tenant_id is not None:
+            headers[TARGET_TENANT_ID] = self._target_tenant_id
+        return headers
+
 
 class VisierSession:
     """Visier Session object through which SQL-like queries are executed.
@@ -96,7 +109,7 @@ class VisierSession:
         num_attempts_left = 2
         is_ok = False
         while not is_ok and num_attempts_left > 0:
-            context = SessionContext(self._session, self._auth.host)
+            context = SessionContext(self._session, self._auth.host, self._auth.target_tenant_id)
             result = call_function(context)
             num_attempts_left -= 1
             is_ok = result.ok
@@ -115,7 +128,9 @@ class VisierSession:
         self.close()
 
     def _execute_query_api(self, path: str, body: object):
-        """Helper method for executing a query API with flattened result."""
+        """Helper method for executing a query API with flattened result.
+        This is a legacy and deprecated method that doesn't support partner administrative
+        principals to execute queries in the customer tenants."""
         result = self.execute(lambda s: s.session().post(url=s.mk_url(path),
                                                          json=body,
                                                          headers=self.HEADER))

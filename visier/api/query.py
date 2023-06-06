@@ -42,5 +42,7 @@ class QueryApiClient(ApiClientBase):
         """Helper method for executing a query API with flattened result."""
         result = self.run(lambda s: s.session().post(url=s.mk_url(path),
                                                          json=body,
-                                                         headers=self.HEADER))
-        return ResultTable(result.iter_lines())
+                                                         headers=s.mk_headers(self.HEADER)))
+        if result is not None:
+            return ResultTable(result.iter_lines())
+        return None
