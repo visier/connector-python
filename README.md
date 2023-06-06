@@ -12,7 +12,7 @@ The connector acts as a bridge between your Python application, which is typical
 * That user's password
 
 ## Authentication Environment
-In order to avoid passing authentication credentials in via command line argumentsm, Visier recommends that basic authentication credentials such as username and password are provided via environment variables. 
+In order to avoid passing authentication credentials in via command line arguments, Visier recommends that basic authentication credentials such as username and password are provided via environment variables. 
 
 Though the Visier Python Connector doesn't directly interact with the environment variables, the following list and example below illustrate the various authentication parameters
 * `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant

@@ -21,6 +21,7 @@ from requests import Session, Response
 from deprecated import deprecated
 from .table import ResultTable
 from .authentication import Authentication
+from .constants import TARGET_TENANT_ID
 
 
 class QueryExecutionError(Exception):
@@ -64,7 +65,7 @@ class SessionContext:
         if headers is None:
             headers = {}
         if self._tenant is not None:
-            headers["TargetTenantID"] = self._tenant
+            headers[TARGET_TENANT_ID] = self._tenant
         return headers
 
 
