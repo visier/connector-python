@@ -29,7 +29,7 @@ class ModelApiClient(ApiClientBase):
         def call_impl(context: SessionContext) -> Response:
             args = _ids_as_url_args(ids)
             url = context.mk_url(f"/v1/data/model/analytic-objects{args}")
-            return context.session().get(url)
+            return _get_with_header(context, url)
         return self.run(call_impl)
 
     def get_dimensions(self, object_id: str, ids: List[str] = None) -> Response:
@@ -37,7 +37,7 @@ class ModelApiClient(ApiClientBase):
         def call_impl(context: SessionContext) -> Response:
             args = _ids_as_url_args(ids)
             url = context.mk_url(f"/v1/data/model/analytic-objects/{object_id}/dimensions{args}")
-            return context.session().get(url)
+            return _get_with_header(context, url)
         return self.run(call_impl)
 
     def get_selection_concepts(self, object_id: str, ids: List[str] = None) -> Response:
@@ -45,7 +45,7 @@ class ModelApiClient(ApiClientBase):
         def call_impl(context: SessionContext) -> Response:
             args = _ids_as_url_args(ids)
             url = context.mk_url(f"/v1/data/model/analytic-objects/{object_id}/selection-concepts{args}")
-            return context.session().get(url)
+            return _get_with_header(context, url)
         return self.run(call_impl)
 
     def get_properties(self, object_id: str, ids: List[str] = None) -> Response:
@@ -53,7 +53,7 @@ class ModelApiClient(ApiClientBase):
         def call_impl(context: SessionContext) -> Response:
             args = _ids_as_url_args(ids)
             url = context.mk_url(f"/v1/data/model/analytic-objects/{object_id}/properties{args}")
-            return context.session().get(url)
+            return _get_with_header(context, url)
         return self.run(call_impl)
 
     def get_metrics(self, ids: List[str] = None) -> Response:
@@ -61,23 +61,27 @@ class ModelApiClient(ApiClientBase):
         def call_impl(context: SessionContext) -> Response:
             args = _ids_as_url_args(ids)
             url = context.mk_url(f"/v1/data/model/metrics{args}")
-            return context.session().get(url)
+            return _get_with_header(context, url)
         return self.run(call_impl)
 
     def get_metric_dimensions(self, metric_id: str) -> Response:
         """Get dimensions by id"""
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"/v1/data/model/metrics/{metric_id}/dimensions")
-            return context.session().get(url)
+            return _get_with_header(context, url)
         return self.run(call_impl)
 
     def get_metric_selection_concepts(self, metric_id: str) -> Response:
         """Get concepts by id"""
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"/v1/data/model/metrics/{metric_id}/selection-concepts")
-            return context.session().get(url)
+            return _get_with_header(context, url)
         return self.run(call_impl)
 
+
+def _get_with_header(context: SessionContext, url: str) -> Response:
+    """Invokes the Model GET request on the provided url with the provided headers."""
+    return context.session().get(url, headers=context.mk_headers())
 
 def _ids_as_url_args(ids: List[str]) -> str:
     """Constructs a URL argument string from a list of ids."""

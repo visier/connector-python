@@ -48,7 +48,7 @@ class DirectIntakeApiClient(ApiClientBase):
         - configuration: The direct intake environment configuration."""
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/configs")
-            return context.session().put(url, json=configuration.config)
+            return context.session().put(url, json=configuration.config, headers=context.mk_headers())
         return self.run(call_impl)
 
     def get_object_schema(self, object_id: str) -> Response:
@@ -58,14 +58,14 @@ class DirectIntakeApiClient(ApiClientBase):
         - object_id: The id of the object to get the schema for"""
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/schemas/{object_id}")
-            return context.session().get(url)
+            return context.session().get(url, headers=context.mk_headers())
         return self.run(call_impl)
 
     def start_transaction(self) -> Response:
         """Start an upload transaction"""
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/transactions")
-            return context.session().post(url)
+            return context.session().post(url, headers=context.mk_headers())
         return self.run(call_impl)
 
     def upload_file(self, transaction_id: str, object_name: str, payload_file_path: str) -> Response:
@@ -79,7 +79,7 @@ class DirectIntakeApiClient(ApiClientBase):
             url = context.mk_url(f"{BASE_PATH}/transactions/{transaction_id}/{object_name}")
             with open(payload_file_path, "rb") as payload_file:
                 files = {"file": payload_file}
-                return context.session().put(url, files=files)
+                return context.session().put(url, files=files, headers=context.mk_headers())
         return self.run(call_impl)
 
     def rollback_transaction(self, transaction_id: str) -> Response:
@@ -89,7 +89,7 @@ class DirectIntakeApiClient(ApiClientBase):
         - transaction_id: The transaction id returned by start_transaction"""
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/transactions/{transaction_id}")
-            return context.session().delete(url)
+            return context.session().delete(url, headers=context.mk_headers())
         return self.run(call_impl)
 
     def commit_transaction(self, transaction_id: str) -> Response:
@@ -99,7 +99,7 @@ class DirectIntakeApiClient(ApiClientBase):
         - transaction_id: The transaction id returned by start_transaction"""
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/transactions/{transaction_id}")
-            return context.session().post(url)
+            return context.session().post(url, headers=context.mk_headers())
         return self.run(call_impl)
 
     def get_transaction_status(self, transaction_id: str) -> Response:
@@ -109,5 +109,5 @@ class DirectIntakeApiClient(ApiClientBase):
         - transaction_id: The transaction id returned by start_transaction"""
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/transactions/{transaction_id}")
-            return context.session().get(url)
+            return context.session().get(url, headers=context.mk_headers())
         return self.run(call_impl)
