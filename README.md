@@ -20,7 +20,7 @@ Though the Visier Python Connector doesn't directly interact with the environmen
 * `VISIER_PASSWORD`: The password of that user
 * `VISIER_APIKEY`: The API key granted by Visier
 * `VISIER_VANITY`: The readable name of the customer organization
-* `VISIER_TENANT`: The technical name of the tenant for the customer. This is only applicable in partner configurations.
+* `VISIER_TARGET_TENANT_ID`: The technical name of the tenant for the customer. This is only applicable in partner configurations.
 
 To illustrate this process, consider the following example approach suitable in a non-production environment:
 
@@ -32,7 +32,7 @@ export VISIER_VANITY=example
 export VISIER_HOST=https://$VISIER_VANITY.api.visier.io
 export VISIER_USERNAME=apiuser@example.com
 export VISIER_PASSWORD=$vpwd
-export VISIER_TENANT=tenant-code
+export VISIER_TARGET_TENANT_ID=tenant-code
 export VISIER_APIKEY=the-api-key-issued-by-visier
 ```
 

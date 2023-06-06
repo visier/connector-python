@@ -29,7 +29,7 @@ class Authentication:
     api_key -- The tenant's API Key
     host -- The host and protocol portion of the url. E.g. https://customer-name.visierinc.io
     vanity -- Optional vanity name for the customer
-    tenant -- Optional tenant name for the partner
+    target_tenant_id -- Optional tenant id to target in a partner authentication setting
     """
 
     def __init__(
@@ -39,7 +39,7 @@ class Authentication:
             api_key: str,
             host: str,
             vanity: str = None,
-            tenant: str = None) -> None:
+            target_tenant_id: str = None) -> None:
         if not username or not password or not api_key or not host:
             raise ValueError("""ERROR: Missing required credentials.
             Please provide username, password, api_key, and host.""")
@@ -49,4 +49,4 @@ class Authentication:
         self.api_key = api_key
         self.username = username
         self.password = password
-        self.tenant = tenant
+        self.target_tenant_id = target_tenant_id

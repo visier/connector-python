@@ -47,10 +47,10 @@ class SessionContext:
     """
     Context object passed to the user-defined function in the execute() method.
     """
-    def __init__(self, session: Session, host: str, tenant: str = None) -> None:
+    def __init__(self, session: Session, host: str, target_tenant_id: str = None) -> None:
         self._session = session
         self._host = host
-        self._tenant = tenant
+        self._target_tenant_id = target_tenant_id
 
     def session(self) -> Session:
         """Returns the current session object"""
@@ -64,8 +64,8 @@ class SessionContext:
         """Returns the headers for the current request"""
         if headers is None:
             headers = {}
-        if self._tenant is not None:
-            headers[TARGET_TENANT_ID] = self._tenant
+        if self._target_tenant_id is not None:
+            headers[TARGET_TENANT_ID] = self._target_tenant_id
         return headers
 
 
@@ -109,7 +109,7 @@ class VisierSession:
         num_attempts_left = 2
         is_ok = False
         while not is_ok and num_attempts_left > 0:
-            context = SessionContext(self._session, self._auth.host, self._auth.tenant)
+            context = SessionContext(self._session, self._auth.host, self._auth.target_tenant_id)
             result = call_function(context)
             num_attempts_left -= 1
             is_ok = result.ok
