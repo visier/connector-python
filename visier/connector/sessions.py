@@ -58,7 +58,7 @@ class SessionContext:
     def mk_url(self, path: str) -> str:
         """Returns a URL for the given path"""
         return self._host + path
-    
+
     def mk_headers(self, headers: dict = None) -> dict:
         """Returns the headers for the current request"""
         if headers is None:

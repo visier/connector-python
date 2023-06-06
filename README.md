@@ -11,6 +11,36 @@ The connector acts as a bridge between your Python application, which is typical
 * A username identifying a user within your organization's Visier tenant who has been granted API access capabilities.
 * That user's password
 
+## Authentication Environment
+In order to avoid passing authentication credentials in via command line argumentsm, Visier recommends that basic authentication credentials such as username and password are provided via environment variables. 
+
+Though the Visier Python Connector doesn't directly interact with the environment variables, the following list and example below illustrate the various authentication parameters
+* `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant
+* `VISIER_USERNAME`: The user name with sufficient API capabilities
+* `VISIER_PASSWORD`: The password of that user
+* `VISIER_APIKEY`: The API key granted by Visier
+* `VISIER_VANITY`: The readable name of the customer organization
+* `VISIER_TENANT`: The technical name of the tenant for the customer. This is only applicable in partner configurations.
+
+To illustrate this process, consider the following example approach suitable in a non-production environment:
+
+On Linux-like systems, create a file named `.env` and populate it like the following example, substituting with actual values as appropriate:
+```sh
+echo -n "Enter the password for the Visier API User: "
+read -s vpwd
+export VISIER_VANITY=example
+export VISIER_HOST=https://$VISIER_VANITY.api.visier.io
+export VISIER_USERNAME=apiuser@example.com
+export VISIER_PASSWORD=$vpwd
+export VISIER_TENANT=tenant-code
+export VISIER_APIKEY=the-api-key-issued-by-visier
+```
+
+Source this environment in and provide the password when prompted:
+```sh
+$ source .env
+```
+
 ## Connector Separation
 As of version `0.9.5`, the Python connector has separated the API calls from the `VisierSession` object. As a result of this change, the query execution methods on the `VisierSession` have been deprecated and will be subject to removal in a future release.
 
