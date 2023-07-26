@@ -18,8 +18,12 @@ Basic Authentication class for Visier Connector
 import os
 import dataclasses
 from abc import ABC
-from .constants import *
+from .constants import (ENV_VISIER_USERNAME, ENV_VISIER_PASSWORD, ENV_VISIER_HOST,
+                        ENV_VISIER_APIKEY, ENV_VISIER_VANITY, ENV_VISIER_CLIENT_ID,
+                        ENV_VISIER_REDIRECT_URI, ENV_VISIER_TARGET_TENANT_ID)
 
+
+@dataclasses.dataclass
 class Authentication(ABC):
     """Abstract base class for authentication configuration definition"""
     def __init__(self,
@@ -107,15 +111,15 @@ def auth_from_env() -> Authentication:
             api_key = os.getenv(ENV_VISIER_APIKEY),
             vanity = os.getenv(ENV_VISIER_VANITY),
             target_tenant_id = os.getenv(ENV_VISIER_TARGET_TENANT_ID))
-    else:
-        client_id = os.getenv(ENV_VISIER_CLIENT_ID)
-        if (client_id):
-            return OAuth2(
-                host = os.getenv(ENV_VISIER_HOST),
-                api_key = os.getenv(ENV_VISIER_APIKEY),
-                client_id = client_id,
-                redirect_uri = os.getenv(ENV_VISIER_REDIRECT_URI),
-                target_tenant_id = os.getenv(ENV_VISIER_TARGET_TENANT_ID))
-        else:
-            raise ValueError("""ERROR: Missing required credentials.
-            Please provide either Basic or OAuth2 credentials.""")
+
+    client_id = os.getenv(ENV_VISIER_CLIENT_ID)
+    if client_id:
+        return OAuth2(
+            host = os.getenv(ENV_VISIER_HOST),
+            api_key = os.getenv(ENV_VISIER_APIKEY),
+            client_id = client_id,
+            redirect_uri = os.getenv(ENV_VISIER_REDIRECT_URI),
+            target_tenant_id = os.getenv(ENV_VISIER_TARGET_TENANT_ID))
+
+    raise ValueError("""ERROR: Missing required credentials.
+                     Please provide either Basic or OAuth2 credentials.""")

@@ -15,17 +15,19 @@
 Visier Session object through which JSON as well as SQL-like queries are executed.
 """
 
+import os
 from typing import Callable
+import webbrowser
+from queue import Empty
+import urllib.parse
 import requests
 from requests import Session, Response
 from deprecated import deprecated
 from .table import ResultTable
 from .authentication import Authentication, OAuth2, Basic
-from .constants import TARGET_TENANT_ID
-from .callback import CallbackServer
-import webbrowser
-from queue import Empty
-import urllib.parse
+from .constants import TARGET_TENANT_ID, ENV_VISIER_OAUTH_CALLBACK_URL
+from .callback import CallbackServer, CallbackBinding
+
 
 class QueryExecutionError(Exception):
     """Description of error from executing a query"""
@@ -45,6 +47,7 @@ class QueryExecutionError(Exception):
         """Returns the error message"""
         return self._message
 
+
 class OAuthConnectError(Exception):
     """Raised when there is an error connecting to Visier using OAuth2"""
     def __init__(self, message) -> None:
@@ -55,6 +58,7 @@ class OAuthConnectError(Exception):
     def message(self) -> str:
         """Returns the error message"""
         return self._message
+
 
 class SessionContext:
     """
@@ -93,6 +97,7 @@ class VisierSession:
     def __init__(self, auth: Authentication) -> None:
         self._auth = auth
         self._session = None
+        self._timeout = 30
 
     @deprecated(version="0.9.5", reason="Use visier.api.QueryApiClient instead")
     def execute_aggregate(self, query_def: object):
@@ -157,7 +162,9 @@ class VisierSession:
             self.connect_basic(self._auth)
 
     def connect_oauth(self, auth: OAuth2):
-        """Connect to Visier using OAuth2."""
+        """Connect to Visier using (three-legged) OAuth2.
+        This method will attempt to open a browser for the authentication and consent screens.
+        It will also spin up a local web server to receive the OAuth2 authorization code."""
         url_prefix = auth.host + "/v1/auth/oauth2"
 
         def get_token(code: str) -> str:
@@ -168,17 +175,18 @@ class VisierSession:
                 "scope": "read",
                 "code": code
             }
-            # if we have a redirect_uri when getting the auth code, we also must include it in the token request as part of the grant
-            if (auth.redirect_uri):
+            # if we have a redirect_uri when getting the auth code, we also must include it in the token
+            # request as part of the grant. https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
+            if auth.redirect_uri:
                 body["redirect_uri"] = auth.redirect_uri
-            response = requests.post(url=url, data=body, headers={"apikey": auth.api_key})
+            response = requests.post(url=url, data=body, headers={"apikey": auth.api_key}, timeout=self._timeout)
             response.raise_for_status()
             response = response.json()
             # Currently not using refresh_token and id_token
             # refresh_token = response['refresh_token']
             # id_token = response['id_token']
             return response['access_token']
-        
+
         def update_session(token: str) -> None:
             headers = {
                 "Authorization": f"Bearer {token}",
@@ -187,22 +195,22 @@ class VisierSession:
             self._session = Session()
             self._session.headers.update(headers)
 
-        with CallbackServer() as svr:
+        callback_url = os.getenv(ENV_VISIER_OAUTH_CALLBACK_URL)
+        binding = CallbackBinding(callback_url)
+        with CallbackServer(binding) as svr:
             if auth.redirect_uri:
                 redirect_uri_arg = f"&redirect_uri={urllib.parse.quote(auth.redirect_uri, safe='')}"
             else:
                 redirect_uri_arg = "" # Empty means use the redirect_uri registered with Visier
             browser_url = f'{url_prefix}/authorize?apikey={auth.api_key}&response_type=code&client_id={auth.client_id}{redirect_uri_arg}'
-            print(browser_url)
             # Launch the browser for authentication and consent screens
             webbrowser.open(browser_url)
             try:
                 # Wait up to 5 minutes for the user to complete the OAuth2 code flow
                 code = svr.queue.get(block=True, timeout=300)
-                print(f"got the code {code}")
                 update_session(get_token(code))
-            except Empty as e:
-                raise OAuthConnectError("Timed out waiting for OAuth2 auth code") from e
+            except Empty as empty:
+                raise OAuthConnectError("Timed out waiting for OAuth2 auth code") from empty
 
     def connect_basic(self, auth: Basic):
         """Connect to Visier using Basic Authentication."""
@@ -215,7 +223,7 @@ class VisierSession:
         body = {'username': auth.username, 'password': auth.password}
         if auth.vanity:
             body["vanityName"] = auth.vanity
-        result = requests.post(url=url, data=body, timeout=30)
+        result = requests.post(url=url, data=body, timeout=self._timeout)
         result.raise_for_status()
 
         # Only create a requests.Session once we have a Visier ASID Token
