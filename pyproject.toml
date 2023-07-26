@@ -16,6 +16,7 @@ dynamic = ["version"]
 dependencies = [
     "requests >= 2.31",
     "deprecated",
+    "flask",
 ]
 
 [tool.poetry]
