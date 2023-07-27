@@ -12,15 +12,45 @@ The connector acts as a bridge between your Python application, which is typical
 * That user's password
 
 ## Authentication Environment
-In order to avoid passing authentication credentials in via command line arguments, Visier recommends that basic authentication credentials such as username and password are provided via environment variables. 
+As of version `0.9.8`, the Visier Python Connector supports two means of authentication:
+1. OAuth2.0: The connector supports the so called three-legged authentication flow. This means that authentication (and consent) have to be provided through the authorization server. In accordance with the OAuth2.0 protocol, no user credentials are provided directly to Visier. This is the preferred authentication method.
+1. Basic Authentication: This is a traditional authentication mechanism where Visier username and password are provided directly to Visier for authentication.
 
-Though the Visier Python Connector doesn't directly interact with the environment variables, the following list and example below illustrate the various authentication parameters
+In order to avoid passing authentication credentials in via command line arguments, Visier recommends that at least basic authentication credentials such as username and password are provided via environment variables. However, using a new function, `make_auth()`, the appropriate authentication configuration object will be created from `VISIER_`-prefixed environment variables, as outlined  below.
+
+### OAuth2.0
+Though the Visier Python Connector doesn't directly interact with the environment variables, the following list and example below illustrate the OAuth2.0 authentication parameters. These are also the environment variables the `make_auth()` utility function will use.
+* `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant as well as to initiate the OAuth2.0 authentication process
+* `VISIER_APIKEY`: The API key granted by Visier
+* `VISIER_CLIENT_ID`: The identifier of the pre-registered application
+* `VISIER_REDIRECT_URI`: The URI the `authorize` call will ultimately redirect to upon a successful authorization code generation. By default, this will be `http://localhost:5000/oauth2/callback` however note that it must match the `redirect_uri` in the client application definition exactly. If the client application setting is different, it is essential that that exact value is provided to the connector.
+* `VISIER_TARGET_TENANT_ID`: The technical name of the tenant for the customer. This is only applicable in partner configurations
+
+On Linux-like systems, with an X-display available, create a file named `.env` and populate it like the following example, substituting with actual values as appropriate:
+```sh
+export VISIER_HOST=https://customer-specific.api.visier.io
+export VISIER_CLIENT_ID=client-id
+export VISIER_APIKEY=the-api-key-issued-by-visier
+export VISIER_REDIRECT_URI=
+# export VISIER_REDIRECT_URI=http://localhost:5000/oauth2/callback
+export VISIER_TARGET_TENANT_ID=
+export VISIER_USERNAME=
+export VISIER_PASSWORD=
+```
+
+Source this file in and the environment is ready for using the connector with OAuth2.0 authentication:
+```sh
+$ source .env
+```
+
+### Basic Authentication
+Though the Visier Python Connector doesn't directly interact with the environment variables, the following list and example below illustrate the basic authentication parameters. These are also the environment variables the `make_auth()` utility function will use.
 * `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant
 * `VISIER_USERNAME`: The user name with sufficient API capabilities
 * `VISIER_PASSWORD`: The password of that user
 * `VISIER_APIKEY`: The API key granted by Visier
 * `VISIER_VANITY`: The readable name of the customer organization
-* `VISIER_TARGET_TENANT_ID`: The technical name of the tenant for the customer. This is only applicable in partner configurations.
+* `VISIER_TARGET_TENANT_ID`: The technical name of the tenant for the customer. This is only applicable in partner configurations
 
 To illustrate this process, consider the following example approach suitable in a non-production environment:
 
@@ -28,12 +58,13 @@ On Linux-like systems, create a file named `.env` and populate it like the follo
 ```sh
 echo -n "Enter the password for the Visier API User: "
 read -s vpwd
-export VISIER_VANITY=example
+export VISIER_VANITY=customer-specific
 export VISIER_HOST=https://$VISIER_VANITY.api.visier.io
 export VISIER_USERNAME=apiuser@example.com
 export VISIER_PASSWORD=$vpwd
 export VISIER_TARGET_TENANT_ID=tenant-code
 export VISIER_APIKEY=the-api-key-issued-by-visier
+export VISIER_CLIENT_ID=
 ```
 
 Source this environment in and provide the password when prompted:
@@ -71,23 +102,17 @@ A small set of example queries have been provided. Generally, Visier Query API q
 
 Visier also offers an experimental alternative to the JSON-based query definitions: SQL-like. This allows you to make queries using a language that comes close to SQL, which is generally more compact and intuitive. SQL-like allows definition of both aggregate and detail queries.
 
-:warning: **SQL-like is in alpha stage and not yet suitable for production use**.
-
 Example queries are provided through individual _files_. This is merely for convenience. SQL-like, being simple strings, can easily be provided to the call itself.
 
-In order to reduce duplication, each provided sample below should be preceded by the necessary `import` statements as well as authentication credential definition:
+In order to reduce duplication, each provided sample below should be preceded by the necessary `import` statements as well as authentication credential definition (note the use of pandas here is only demo purposes. The Visier Python Connector does not depend on pandas):
 ```python
 import os
-from visier.connector import Authentication, VisierSession
+from visier.connector import VisierSession, make_auth
 from visier.api import QueryApiClient
 from examples import load_json, load_str
 import pandas as pd
 
-auth = Authentication(
-    username = os.getenv("SOME_USERNAME"),
-    password = os.getenv("SOME_PASSWORD"),
-    host = os.getenv("SOME_HOST"),
-    api_key = os.getenv("SOME_APIKEY"))
+auth = make_auth()
 ```
 
 ### Detail Query

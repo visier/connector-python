@@ -15,6 +15,6 @@
 Visier Public Python Connector
 """
 
-from .authentication import Authentication
+from .authentication import Authentication, Basic, OAuth2, add_auth_arguments, make_auth
 from .sessions import VisierSession, SessionContext, QueryExecutionError
 from .table import ResultTable
