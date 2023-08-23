@@ -5,11 +5,10 @@ Use the Visier Python Connector to query Visier People data.
 The connector enables Python developers to query Visier People data using Visier's SQL-like query language. 
 
 ## Prerequisites
-The connector acts as a bridge between your Python application, which is typically Pandas-enabled, and Visier's cloud-hosted service infrastructure. In order to successfully connect to your Visier People data, you need:
+The connector acts as a bridge between your Python application, which is typically Pandas-enabled, and Visier's cloud-based service infrastructure. In order to successfully connect to your Visier People data, you need:
 * The URL domain name prefix. For example: `https://{vanity-name}.api.visier.io`.
 * An API key issued by Visier.
-* A username identifying a user within your organization's Visier tenant who has been granted API access capabilities.
-* That user's password
+* Either an OAuth connector application registration in your Visier tenant or a username and password pair with API access capabilitities.
 
 ## Authentication Environment
 As of version `0.9.8`, the Visier Python Connector supports two means of authentication:
@@ -72,6 +71,8 @@ Source this environment in and provide the password when prompted:
 $ source .env
 ```
 
+## Jupyter notebooks
+Though Jupyter notebooks and lab are well suited to running Visier connector code, the use of OS-level environment variables may not be ideal for many users. For this purpose and since version `0.9.9`,  
 ## Connector Separation
 As of version `0.9.5`, the Python connector has separated the API calls from the `VisierSession` object. As a result of this change, the query execution methods on the `VisierSession` have been deprecated and will be subject to removal in a future release.
 
