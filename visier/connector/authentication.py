@@ -19,7 +19,7 @@ import os
 from argparse import ArgumentParser, Namespace
 import dataclasses
 from abc import ABC
-from typing import Any
+from typing import Any, OrderedDict
 from .constants import (ENV_VISIER_USERNAME, ENV_VISIER_PASSWORD, ENV_VISIER_HOST,
                         ENV_VISIER_APIKEY, ENV_VISIER_VANITY, ENV_VISIER_CLIENT_ID,
                         ENV_VISIER_REDIRECT_URI, ENV_VISIER_TARGET_TENANT_ID)
@@ -110,32 +110,34 @@ def add_auth_arguments(parser: ArgumentParser) -> None:
     parser.add_argument("-u", "--username", help="Visier username", type=str)
     parser.add_argument("-v", "--vanity", help="Visier vanity", type=str)
 
-def make_auth(args: Namespace = None) -> Authentication:
+def make_auth(args: Namespace = None,
+              odict: OrderedDict = None) -> Authentication:
     """Returns an Authentication subclass object based on parsed arguments or environment variable values.
     Delegates more detailed credential completeness checks to the Authentication classes."""
     args = args or NoArgs()
-    host = args.host or os.getenv(ENV_VISIER_HOST)
-    api_key = args.apikey or os.getenv(ENV_VISIER_APIKEY)
-    target_tenant_id = args.target_tenant_id or os.getenv(ENV_VISIER_TARGET_TENANT_ID)
+    odict = odict or OrderedDict()
+    host = args.host or odict.get(ENV_VISIER_HOST) or os.getenv(ENV_VISIER_HOST)
+    api_key = args.apikey or odict.get(ENV_VISIER_APIKEY) or os.getenv(ENV_VISIER_APIKEY)
+    target_tenant_id = args.target_tenant_id or odict.get(ENV_VISIER_TARGET_TENANT_ID) or os.getenv(ENV_VISIER_TARGET_TENANT_ID)
 
-    username = args.username or os.getenv(ENV_VISIER_USERNAME)
-    password = args.password or os.getenv(ENV_VISIER_PASSWORD)
+    username = args.username or odict.get(ENV_VISIER_USERNAME) or os.getenv(ENV_VISIER_USERNAME)
+    password = args.password or odict.get(ENV_VISIER_PASSWORD) or os.getenv(ENV_VISIER_PASSWORD)
     if (username and password):
         return Basic(
             username = username,
             password = password,
             host = host,
             api_key = api_key,
-            vanity = args.vanity or os.getenv(ENV_VISIER_VANITY),
+            vanity = args.vanity or odict.get(ENV_VISIER_VANITY) or os.getenv(ENV_VISIER_VANITY),
             target_tenant_id = target_tenant_id)
 
-    client_id = args.client_id or os.getenv(ENV_VISIER_CLIENT_ID)
+    client_id = args.client_id or odict.get(ENV_VISIER_CLIENT_ID) or os.getenv(ENV_VISIER_CLIENT_ID)
     if client_id:
         return OAuth2(
             host = host,
             api_key = api_key,
             client_id = client_id,
-            redirect_uri = args.redirect_uri or os.getenv(ENV_VISIER_REDIRECT_URI),
+            redirect_uri = args.redirect_uri or odict.get(ENV_VISIER_REDIRECT_URI)  or os.getenv(ENV_VISIER_REDIRECT_URI),
             target_tenant_id = target_tenant_id)
 
     raise ValueError("""ERROR: Missing required credentials.
