@@ -42,6 +42,9 @@ Source this file in and the environment is ready for using the connector with OA
 $ source .env
 ```
 
+#### Callback URI
+The OAuth flow requires that the authorizing server can call back to the initiating client with an authorization code. When in OAuth mode, the connector will start a transient web server that by default will listen for an authorization code on `http://localhost:5000/oauth2/callback`. This can be modified by setting the appropriate value for `VISIER_REDIRECT_URI`. This value has to match the value provided during client registration exactly. In addition, it must abide by Visier's callback URI rules such as a limited set of permissable subnets. Consult your Visier documentation for details around acceptable callback URIs.
+
 ### Basic Authentication
 Though the Visier Python Connector doesn't directly interact with the environment variables, the following list and example below illustrate the basic authentication parameters. These are also the environment variables the `make_auth()` utility function will use.
 * `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant
@@ -72,7 +75,34 @@ $ source .env
 ```
 
 ## Jupyter notebooks
-Though Jupyter notebooks and lab are well suited to running Visier connector code, the use of OS-level environment variables may not be ideal for many users. For this purpose and since version `0.9.9`,  
+Though Jupyter notebooks and lab are well suited to running Visier connector code, the use of OS-level environment variables may not be ideal for many users in this setting. For this purpose and since version `0.9.9`, the connector supports [dotenv](https://pypi.org/project/python-dotenv/) to facilitate a more dynamic switching of Visier authentication parameters.
+
+### Jupyter OAuth2 example
+In order to authenticate using OAuth, you will need a registered client application configuration in your tenant. Administrator-level privileges are required in order to register OAuth clients. 
+
+Create an environment file to store the authentication parameters. If the file is called `.env`, the Python package `dotenv` will attempt to load that. If given an arbitrary name, that named has to be provided when loading the environment using `dotenv`. 
+
+Example environment file:
+```
+VISIER_HOST=https://customer-specific.api.visier.io
+VISIER_CLIENT_ID=client-id-from-registration
+VISIER_APIKEY=the-api-key-issued-by-visier
+```
+
+Create an OAuth authentication object as per the following snippet:
+```python
+from dotenv import dotenv_values
+from visier.connector import VisierSession, make_auth
+from visier.api import QueryApiClient
+
+env_creds = dotenv_values()
+auth = make_auth(env_values=env_creds)
+
+with VisierSession(auth) as s:
+    query_client = QueryApiClient(s)
+    ...
+```
+
 ## Connector Separation
 As of version `0.9.5`, the Python connector has separated the API calls from the `VisierSession` object. As a result of this change, the query execution methods on the `VisierSession` have been deprecated and will be subject to removal in a future release.
 
