@@ -43,7 +43,7 @@ $ source .env
 ```
 
 #### Callback URI
-The OAuth flow requires that the authorizing server can call back to the initiating client with an authorization code. When in OAuth mode, the connector will start a transient web server that by default will listen for an authorization code on `http://localhost:5000/oauth2/callback`. This can be modified by setting the appropriate value for `VISIER_REDIRECT_URI`. This value has to match the value provided during client registration exactly. In addition, it must abide by Visier's callback URI rules such as a limited set of permissable subnets. Consult your Visier documentation for details around acceptable callback URIs.
+The OAuth flow requires that the authorizing server can call back to the initiating client with an authorization code. In OAuth mode, the connector starts a transient web server that listens for an authorization code on http://localhost:5000/oauth2/callback. You can modify the URL by setting a different value for VISIER_REDIRECT_URI. The VISIER_DIRECT_URI value must exactly match the URI value in your Visier OAuth 2.0 client registration and must abide by Visier's callback URI rules, such as a limited set of permissible subnets.
 
 ### Basic Authentication
 Though the Visier Python Connector doesn't directly interact with the environment variables, the following list and example below illustrate the basic authentication parameters. These are also the environment variables the `make_auth()` utility function will use.
@@ -74,13 +74,13 @@ Source this environment in and provide the password when prompted:
 $ source .env
 ```
 
-## Jupyter notebooks
-Though Jupyter notebooks and lab are well suited to running Visier connector code, the use of OS-level environment variables may not be ideal for many users in this setting. For this purpose and since version `0.9.9`, the connector supports [dotenv](https://pypi.org/project/python-dotenv/) to facilitate a more dynamic switching of Visier authentication parameters.
+## Jupyter Notebooks
+Jupyter notebooks and lab are well-suited to run Visier connector code. However, some users may not find OS-level variables ideal. As of version `0.9.9`, the Visier Python connector supports [dotenv](https://pypi.org/project/python-dotenv/) to facilitate a more dynamic switching of Visier authentication parameters.
 
-### Jupyter OAuth2 example
-In order to authenticate using OAuth, you will need a registered client application configuration in your tenant. Administrator-level privileges are required in order to register OAuth clients. 
+### Jupyter OAuth 2.0 Example
+To authenticate with OAuth, you must first register an OAuth 2.0 client in Visier. Visier administrators can register OAuth clients.
 
-Create an environment file to store the authentication parameters. If the file is called `.env`, the Python package `dotenv` will attempt to load that. If given an arbitrary name, that named has to be provided when loading the environment using `dotenv`. 
+After the OAuth client is registered in Visier, create an environment file to store the authentication parameters. If the file is called `.env`, the Python package `dotenv` attempts to load the file. If the file has a different name, you must provide that file name when loading the environment with `dotenv`.
 
 Example environment file:
 ```
@@ -89,7 +89,7 @@ VISIER_CLIENT_ID=client-id-from-registration
 VISIER_APIKEY=the-api-key-issued-by-visier
 ```
 
-Create an OAuth authentication object as per the following snippet:
+Create an OAuth authentication object as described in the following snippet:
 ```python
 from dotenv import dotenv_values
 from visier.connector import VisierSession, make_auth
@@ -104,7 +104,7 @@ with VisierSession(auth) as s:
 ```
 
 ## Connector Separation
-As of version `0.9.5`, the Python connector has separated the API calls from the `VisierSession` object. As a result of this change, the query execution methods on the `VisierSession` have been deprecated and will be subject to removal in a future release.
+As of version `0.9.5`, the Python connector separates API calls from the `VisierSession` object. As a result of this change, query execution methods on the `VisierSession` are deprecated and will be removed in a future release.
 
 The new way of invoking Visier public APIs through the Visier Python connector requires instantiating the appropriate API client and calling the methods defined on the client object. The following example, invokes the `analytic-objects` Model API to obtain the metadata for two analytic objects:
 ```python
@@ -114,7 +114,7 @@ The new way of invoking Visier public APIs through the Visier Python connector r
         objs = model_client.get_analytic_objects(["Requisition", "Employee_Exit"])
         print(objs.text)
 ```
-### Error handling
+### Error Handling
 By default, a failed API call will return `None` and information about the error is available on the client object. Using the example above, the last error in the event `objs` was `None` would be `model_client.last_error()`.
 
 It is however possible to force the API client to instead raise a `QueryExecutionException`. This is accomplished when instantiating the API client with the following parameter value `raise_on_error=True`. Using the example above, the `model_client` instantiation would look like this: `model_client = ModelApiClient(session, raise_on_error=True)`.
