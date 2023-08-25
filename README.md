@@ -18,7 +18,7 @@ As of version `0.9.8`, the Visier Python Connector supports two means of authent
 In order to avoid passing authentication credentials in via command line arguments, Visier recommends that at least basic authentication credentials such as username and password are provided via environment variables. However, using a new function, `make_auth()`, the appropriate authentication configuration object will be created from `VISIER_`-prefixed environment variables, as outlined  below.
 
 ### OAuth2.0
-Though the Visier Python Connector doesn't directly interact with the environment variables, the following list and example below illustrate the OAuth2.0 authentication parameters. These are also the environment variables the `make_auth()` utility function will use.
+The following list and example below illustrate the OAuth2.0 authentication parameters. These are also the environment and `dotenv` variables the `make_auth()` utility function will use when instantiating an authentication object.
 * `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant as well as to initiate the OAuth2.0 authentication process
 * `VISIER_APIKEY`: The API key granted by Visier
 * `VISIER_CLIENT_ID`: The identifier of the pre-registered application
@@ -75,12 +75,41 @@ $ source .env
 ```
 
 ## Jupyter Notebooks
-Jupyter notebooks and lab are well-suited to run Visier connector code. However, some users may not find OS-level variables ideal. As of version `0.9.9`, the Visier Python connector supports [dotenv](https://pypi.org/project/python-dotenv/) to facilitate a more dynamic switching of Visier authentication parameters.
+Jupyter notebooks and lab are well-suited to run Visier connector code. However, some users may not find OS-level variables ideal. As of version `0.9.9`, the Visier Python connector supports [dotenv](https://pypi.org/project/python-dotenv/) to facilitate a more dynamic switching of Visier authentication parameters. If the file is called `.env`, the Python package `dotenv` attempts to load the file. If the file has a different name, you must provide that file name when loading the environment with `dotenv`.
+
+### Jupyter Basic Authentication Example
+Basic Authentication is the most practical means of authenticating against Visier for Jupyter notebooks.
+
+Create an environment file to store the authentication parameters.
+
+Example environment file:
+```
+VISIER_VANITY=customer-specific
+VISIER_HOST=https://customer-specific.api.visier.io
+VISIER_APIKEY=the-api-key-issued-by-visier
+VISIER_USERNAME=apiuser@example.com
+VISIER_PASSWORD=password-or-variable-reference
+```
+
+Create a basic authentication object as described in the following snippet:
+```python
+from dotenv import dotenv_values
+from visier.connector import VisierSession, make_auth
+from visier.api import QueryApiClient
+
+env_creds = dotenv_values()
+auth = make_auth(env_values=env_creds)
+
+with VisierSession(auth) as s:
+    query_client = QueryApiClient(s)
+    ...
+```
 
 ### Jupyter OAuth 2.0 Example
+Note that OAuth authentication to Visier in Jupyter notebooks is only supported when the Jupyter server runs on your local computer, bound to `localhost`. Therefore, OAuth in Jupyter notebooks against Visier is only recommended for test and development uses.
 To authenticate with OAuth, you must first register an OAuth 2.0 client in Visier. Visier administrators can register OAuth clients.
 
-After the OAuth client is registered in Visier, create an environment file to store the authentication parameters. If the file is called `.env`, the Python package `dotenv` attempts to load the file. If the file has a different name, you must provide that file name when loading the environment with `dotenv`.
+After the OAuth client is registered in Visier, create an environment file to store the authentication parameters.
 
 Example environment file:
 ```
