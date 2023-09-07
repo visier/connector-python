@@ -23,7 +23,8 @@ from abc import ABC
 from typing import Any, OrderedDict
 from .constants import (ENV_VISIER_USERNAME, ENV_VISIER_PASSWORD, ENV_VISIER_HOST,
                         ENV_VISIER_APIKEY, ENV_VISIER_VANITY, ENV_VISIER_CLIENT_ID,
-                        ENV_VISIER_REDIRECT_URI, ENV_VISIER_TARGET_TENANT_ID)
+                        ENV_VISIER_REDIRECT_URI, ENV_VISIER_TARGET_TENANT_ID,
+                        ENV_VISIER_CLIENT_SECRET)
 
 
 @dataclasses.dataclass
@@ -83,6 +84,7 @@ class OAuth2(Authentication):
     host -- The host and protocol portion of the url. E.g. https://customer-name.visierinc.io
     api_key -- The tenant's API Key
     client_id -- The OAuth2 client id
+    client_secret -- The OAuth2 client secret
     redirect_uri -- Optional redirect uri for the OAuth2 callback
     target_tenant_id -- Optional tenant id to target in a partner authentication setting
     """
@@ -91,12 +93,14 @@ class OAuth2(Authentication):
                  host: str,
                  api_key: str,
                  client_id: str,
+                 client_secret: str,
                  redirect_uri: str = None,
                  target_tenant_id: str = None) -> None:
         super().__init__(host, api_key, target_tenant_id)
         if not client_id:
             raise ValueError("""ERROR: Missing required OAuth2 credentials.
             Please provide host, api_key and client_id. redirect_uri is optional.""")
+        self.client_secret = client_secret
         self.client_id = client_id
         self.redirect_uri = redirect_uri
 
@@ -104,6 +108,7 @@ def add_auth_arguments(parser: ArgumentParser) -> None:
     """Augments an ArgumentParser with arguments for authentication configuration."""
     parser.add_argument("-a", "--apikey", help="Visier API key", type=str)
     parser.add_argument("-c", "--client-id", help="Visier OAuth client ID", type=str)
+    parser.add_argument("-S", "--client-secret", help="Visier OAuth client secret", type=str)
     parser.add_argument("-H", "--host", help="Visier host", type=str)
     parser.add_argument("-p", "--password", help="Visier password", type=str)
     parser.add_argument("-r", "--redirect-uri", help="Visier OAuth redirect URI", type=str)
@@ -146,6 +151,7 @@ def make_auth(args: Namespace = None,
             host = host,
             api_key = api_key,
             client_id = client_id,
+            client_secret = args.client_secret or dot_or_os(ENV_VISIER_CLIENT_SECRET),
             redirect_uri = args.redirect_uri or dot_or_os(ENV_VISIER_REDIRECT_URI),
             target_tenant_id = target_tenant_id)
 
@@ -153,7 +159,8 @@ def make_auth(args: Namespace = None,
                      Please provide either Basic or OAuth2 credentials.
                      Both methods require host and api_key.
                      Basic also requires username and password.
-                     OAuth2 also requires client_id.""")
+                     OAuth2 also requires client_id.
+                     Customer applications using OAuth also requires client_secret.""")
 
 @dataclasses.dataclass
 class NoArgs(Namespace):
@@ -163,6 +170,7 @@ class NoArgs(Namespace):
         self.host = None
         self.apikey = None
         self.client_id = None
+        self.client_secret = None
         self.redirect_uri = None
         self.target_tenant_id = None
         self.username = None

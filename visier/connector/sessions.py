@@ -180,7 +180,19 @@ class VisierSession:
             # request as part of the grant. https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
             if auth.redirect_uri:
                 body["redirect_uri"] = auth.redirect_uri
-            response = requests.post(url=url, data=body, headers={"apikey": auth.api_key}, timeout=self._timeout)
+            # If we have a client_secret (which is required for applications that are regstered
+            # by customers), we must include it in the token request.
+            if auth.client_secret:
+                response = requests.post(url=url,
+                                         data=body,
+                                         headers={"apikey": auth.api_key},
+                                         timeout=self._timeout,
+                                         auth=(auth.client_id, auth.client_secret))
+            else:
+                response = requests.post(url=url,
+                                         data=body,
+                                         headers={"apikey": auth.api_key},
+                                         timeout=self._timeout)
             response.raise_for_status()
             response = response.json()
             # Currently not using refresh_token and id_token

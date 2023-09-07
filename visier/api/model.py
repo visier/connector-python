@@ -41,6 +41,13 @@ class ModelApiClient(ApiClientBase):
             return _get_with_header(context, url)
         return self.run(call_impl)
 
+    def get_members(self, object_id: str, dimension_id: str) -> Response:
+        """Get members by object and dimensions id"""
+        def call_impl(context: SessionContext) -> Response:
+            url = context.mk_url(f"/v1/data/model/analytic-objects/{object_id}/dimensions/{dimension_id}/members")
+            return _get_with_header(context, url)
+        return self.run(call_impl)
+
     def get_selection_concepts(self, object_id: str, ids: List[str] = None) -> Response:
         """Get concepts by id"""
         def call_impl(context: SessionContext) -> Response:
