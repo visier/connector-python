@@ -195,7 +195,7 @@ class VisierSession:
         self._session.headers.update(headers)
 
     def _request_token(self, auth: OAuth2, body: dict) -> str:
-        def get_client_auth() -> dict | None:
+        def get_client_auth():
             if auth.client_id and auth.client_secret:
                 return (auth.client_id, auth.client_secret)
             return None
