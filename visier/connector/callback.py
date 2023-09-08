@@ -20,8 +20,12 @@ import threading
 import dataclasses
 from urllib.parse import urlparse
 from queue import Queue
+import logging
 from flask import Flask, request
 from werkzeug.serving import make_server
+
+# Disable to avoid Flask logging on callbacks
+logging.getLogger('werkzeug').disabled = True
 
 @dataclasses.dataclass
 class CallbackBinding:

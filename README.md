@@ -19,11 +19,12 @@ In order to avoid passing authentication credentials in via command line argumen
 
 ### OAuth2.0
 The following list and example below illustrate the OAuth2.0 authentication parameters. These are also the environment and `dotenv` variables the `make_auth()` utility function will use when instantiating an authentication object.
-* `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant as well as to initiate the OAuth2.0 authentication process
-* `VISIER_APIKEY`: The API key granted by Visier
-* `VISIER_CLIENT_ID`: The identifier of the pre-registered application
+* `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant as well as to initiate the OAuth2.0 authentication process.
+* `VISIER_APIKEY`: The API key granted by Visier.
+* `VISIER_CLIENT_ID`: The identifier of the pre-registered application.
+* `VISIER_CLIENT_SECRET`: The generated secret of the pre-registered application, required for customer-registered applications.
 * `VISIER_REDIRECT_URI`: The URI the `authorize` call will ultimately redirect to upon a successful authorization code generation. By default, this will be `http://localhost:5000/oauth2/callback` however note that it must match the `redirect_uri` in the client application definition exactly. If the client application setting is different, it is essential that that exact value is provided to the connector.
-* `VISIER_TARGET_TENANT_ID`: The technical name of the tenant for the customer. This is only applicable in partner configurations
+* `VISIER_TARGET_TENANT_ID`: The technical name of the tenant for the customer. This is only applicable in partner configurations.
 
 On Linux-like systems, with an X-display available, create a file named `.env` and populate it like the following example, substituting with actual values as appropriate:
 ```sh
@@ -35,13 +36,31 @@ export VISIER_REDIRECT_URI=
 export VISIER_TARGET_TENANT_ID=
 export VISIER_USERNAME=
 export VISIER_PASSWORD=
+
+echo -n "Enter the client secret for client with id $VISIER_CLIENT_ID: "
+read -s secret
+export VISIER_CLIENT_SECRET=$secret
 ```
+
+Note that you may provide a valid username and password combination using the variables outlined above. When username and password are provided along with the client ID and secret, the connector will instead of the authorization code flow, use the password flow. This approach is not recommended in a production environment.
 
 Source this file in and the environment is ready for using the connector with OAuth2.0 authentication:
 ```sh
 $ source .env
 ```
 
+Because the connector supports [python-dotenv] (https://pypi.org/project/python-dotenv/), some users may prefer to define assignments directly in `.env` instead of sourcing it into the OS environment. In the following snippet, the connector uses credentials obtained with dotenv.
+```python
+from dotenv import dotenv_values
+from visier.connector import VisierSession, make_auth
+from visier.api import ModelApiClient
+
+env_creds = dotenv_values()
+auth = make_auth(env_values=env_creds)
+
+with VisierSession(auth) as s:
+    ...
+```
 #### Callback URI
 The OAuth flow requires that the authorizing server can call back to the initiating client with an authorization code. In OAuth mode, the connector starts a transient web server that listens for an authorization code on http://localhost:5000/oauth2/callback. You can modify the URL by setting a different value for VISIER_REDIRECT_URI. The VISIER_DIRECT_URI value must exactly match the URI value in your Visier OAuth 2.0 client registration and must abide by Visier's callback URI rules, such as a limited set of permissible subnets.
 
