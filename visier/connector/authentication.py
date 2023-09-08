@@ -85,6 +85,8 @@ class OAuth2(Authentication):
     api_key -- The tenant's API Key
     client_id -- The OAuth2 client id
     client_secret -- The OAuth2 client secret
+    username -- Optional username for password grant OAuth2 flow
+    password -- Optional password for password grant OAuth2 flow
     redirect_uri -- Optional redirect uri for the OAuth2 callback
     target_tenant_id -- Optional tenant id to target in a partner authentication setting
     """
@@ -94,6 +96,8 @@ class OAuth2(Authentication):
                  api_key: str,
                  client_id: str,
                  client_secret: str,
+                 username: str,
+                 password: str,
                  redirect_uri: str = None,
                  target_tenant_id: str = None) -> None:
         super().__init__(host, api_key, target_tenant_id)
@@ -102,6 +106,8 @@ class OAuth2(Authentication):
             Please provide host, api_key and client_id. redirect_uri is optional.""")
         self.client_secret = client_secret
         self.client_id = client_id
+        self.username = username
+        self.password = password
         self.redirect_uri = redirect_uri
 
 def add_auth_arguments(parser: ArgumentParser) -> None:
@@ -136,24 +142,27 @@ def make_auth(args: Namespace = None,
 
     username = args.username or dot_or_os(ENV_VISIER_USERNAME)
     password = args.password or dot_or_os(ENV_VISIER_PASSWORD)
-    if (username and password):
-        return Basic(
-            username = username,
-            password = password,
-            host = host,
-            api_key = api_key,
-            vanity = args.vanity or dot_or_os(ENV_VISIER_VANITY),
-            target_tenant_id = target_tenant_id)
 
     client_id = args.client_id or dot_or_os(ENV_VISIER_CLIENT_ID)
     if client_id:
         return OAuth2(
-            host = host,
-            api_key = api_key,
-            client_id = client_id,
-            client_secret = args.client_secret or dot_or_os(ENV_VISIER_CLIENT_SECRET),
-            redirect_uri = args.redirect_uri or dot_or_os(ENV_VISIER_REDIRECT_URI),
-            target_tenant_id = target_tenant_id)
+            host=host,
+            api_key=api_key,
+            client_id=client_id,
+            client_secret=args.client_secret or dot_or_os(ENV_VISIER_CLIENT_SECRET),
+            username=username,
+            password=password,
+            redirect_uri=args.redirect_uri or dot_or_os(ENV_VISIER_REDIRECT_URI),
+            target_tenant_id=target_tenant_id)
+
+    if (username and password):
+        return Basic(
+            username=username,
+            password=password,
+            host=host,
+            api_key=api_key,
+            vanity=args.vanity or dot_or_os(ENV_VISIER_VANITY),
+            target_tenant_id=target_tenant_id)
 
     raise ValueError("""ERROR: Missing required credentials.
                      Please provide either Basic or OAuth2 credentials.

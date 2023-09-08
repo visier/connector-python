@@ -42,12 +42,14 @@ read -s secret
 export VISIER_CLIENT_SECRET=$secret
 ```
 
+Note that you may provide a valid username and password combination using the variables outlined above. When username and password are provided along with the client ID and secret, the connector will instead of the authorization code flow, use the password flow. This approach is not recommended in a production environment.
+
 Source this file in and the environment is ready for using the connector with OAuth2.0 authentication:
 ```sh
 $ source .env
 ```
 
-As the connector supports [python-dotenv](https://pypi.org/project/python-dotenv/), some users may prefer to simply define the assignements directly in `.env` and not source it into the OS environment. The following snippet shows how credentials obtained via `dotenv` can be used by the connector:
+Because the connector supports [python-dotenv] (https://pypi.org/project/python-dotenv/), some users may prefer to define assignments directly in `.env` instead of sourcing it into the OS environment. In the following snippet, the connector uses credentials obtained with dotenv.
 ```python
 from dotenv import dotenv_values
 from visier.connector import VisierSession, make_auth
