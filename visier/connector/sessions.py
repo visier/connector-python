@@ -197,7 +197,7 @@ class VisierSession:
     def _request_token(self, auth: OAuth2, body: dict) -> str:
         def get_client_auth():
             if auth.client_id and auth.client_secret:
-                return (auth.client_id, auth.client_secret)
+                return (auth.client_id, urllib.parse.quote(auth.client_secret, safe=''))
             return None
 
         url = auth.host + "/v1/auth/oauth2/token"
