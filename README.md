@@ -13,7 +13,7 @@ This connector acts as a bridge between your Python application and Visier's clo
 ## Authentication Environment
 As of version `0.9.8`, the Visier Python Connector supports two authentication methods:
 * **OAuth 2.0**: A three-legged authentication flow that authenticates through the authorization server. In OAuth 2.0 protocol, no user credentials are provided directly to Visier. We recommend using the OAuth 2.0 authentication method.
-* **Password authentication**: A two-legged authentication flow that authenticates through a Visier username and password.
+* **Basic authentication**: A traditional authentication flow that authenticates through a Visier username and password.
 
 To avoid passing authentication credentials in with command-line arguments, Visier recommends that basic authentication credentials, such as username and password, are passed in through environment variables. You can use the `make_auth()` function to create the appropriate authentication configuration object from `VISIER_`-prefixed environment variables, as described below.
 
@@ -42,7 +42,7 @@ read -s secret
 export VISIER_CLIENT_SECRET=$secret
 ```
 
-**Note**: You may provide a valid username and password combination with the variables above. If a username and password are provided along with the client ID and secret, the connector will use the password flow instead of the authentication flow. We do not recommend the password method in a production environment.
+**Note**: You may provide a valid username and password combination with the variables above. If a username and password are provided along with the client ID and secret, the connector will use the password grant type instead of the authorization code grant type. We do not recommend the password grant type in a production environment.
 
 Next, source the file below in and then the environment is ready to use the connector with OAuth 2.0 authentication.
 ```sh
@@ -64,8 +64,8 @@ with VisierSession(auth) as s:
 #### Callback URI
 The OAuth 2.0 authentication flow requires that the authorizing server can call back to the initiating client with an authorization code. In OAuth mode, the connector starts a transient web server that listens for an authorization code on http://localhost:5000/oauth2/callback. You can modify the URL by setting a different value for `VISIER_REDIRECT_URI`. The `VISIER_REDIRECT_URI` value must exactly match the URI value in your Visier OAuth 2.0 client registration and must respect Visier's callback URI rules, such as a limited set of permissible subnets.
 
-### Password Authentication
-The Visier Python Connector doesn't directly interact with the environment variables. The following list defines the password authentication parameters. The password authentication parameters are also the environment variables that the `make_auth()` utility function uses.
+### Basic Authentication
+The Visier Python Connector doesn't directly interact with the environment variables. The following list defines the basic authentication parameters. The basic authentication parameters are also the environment variables that the `make_auth()` utility function uses.
 * `VISIER_HOST`: The fully qualified domain name and protocol to access your Visier tenant.
 * `VISIER_USERNAME`: The Visier user that has sufficient API capabilities.
 * `VISIER_PASSWORD`: The password of that user.
@@ -96,8 +96,8 @@ $ source .env
 ## Jupyter Notebooks
 Jupyter notebooks and lab are well-suited to run Visier connector code. However, some users may not find OS-level variables ideal. As of version `0.9.9`, the Visier Python connector supports [dotenv](https://pypi.org/project/python-dotenv/) to facilitate a more dynamic switching of Visier authentication parameters. If the file is called `.env`, the Python package `dotenv` attempts to load the file. If the file has a different name, you must provide that file name when loading the environment with `dotenv`.
 
-### Jupyter Password Authentication Example
-Password authentication is the most practical means of authenticating against Visier for Jupyter notebooks.
+### Jupyter Basic Authentication Example
+Basic authentication is the most practical means of authenticating against Visier for Jupyter notebooks.
 
 Create an environment file to store the authentication parameters.
 
