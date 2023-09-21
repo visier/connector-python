@@ -7,7 +7,7 @@ name = "visier-connector"
 authors = [
     {name = "Visier Research & Development", email = "info@visier.com"},
 ]
-description = """Visier People Data connector"""
+description = """Visier Python Connector"""
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["visier", "data", "query", "connector", "api"]
