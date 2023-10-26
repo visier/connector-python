@@ -17,6 +17,7 @@ API client for the Visier Direct Intake API.
 """
 
 import dataclasses
+from typing import List
 from requests import Response
 from visier.connector import SessionContext
 from .base import ApiClientBase
@@ -28,19 +29,37 @@ BASE_PATH = f"/v1/data/directloads/{DRAFT_ID}"
 class Configuration:
     """Configuration for a Direct Intake environment."""
     config = {}
-    def __init__(self, is_supplemental: bool = None) -> None:
-        self.config = {"job":{"supplementalMode": _to_supplemental(is_supplemental)}}
+    def __init__(self, is_supplemental: bool = None,
+                 extend_objects: List[str] = None) -> None:
+        self.config = {
+            "job": {
+                "supplementalMode": self._to_supplemental(is_supplemental),
+                "extendObjects": self._to_list(extend_objects)
+            }
+        }
 
-def _to_supplemental(is_supplemental: bool) -> str:
-    if is_supplemental is None:
-        return "UNCHANGED"
-    if is_supplemental:
-        return "IS_SUPPLEMENTAL"
-    return "IS_PRIMARY"
+    def _to_supplemental(self, is_supplemental: bool) -> str:
+        if is_supplemental is None:
+            return "UNCHANGED"
+        if is_supplemental:
+            return "IS_SUPPLEMENTAL"
+        return "IS_PRIMARY"
+
+    def _to_list(self, extend_objects: List[str]) -> List[str]:
+        if extend_objects is None:
+            return []
+        return extend_objects
 
 
 class DirectIntakeApiClient(ApiClientBase):
     """API client for the Visier Direct Intake API."""
+
+    def get_configuration(self) -> Response:
+        """Get the configuration for the the direct intake environment."""
+        def call_impl(context: SessionContext) -> Response:
+            url = context.mk_url(f"{BASE_PATH}/configs")
+            return context.session().get(url, headers=context.mk_headers())
+        return self.run(call_impl)
 
     def set_configuration(self, configuration: Configuration) -> Response:
         """Set the configuration for the the direct intake environment.
