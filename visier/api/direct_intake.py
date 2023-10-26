@@ -17,6 +17,7 @@ API client for the Visier Direct Intake API.
 """
 
 import dataclasses
+from typing import List
 from requests import Response
 from visier.connector import SessionContext
 from .base import ApiClientBase
@@ -29,7 +30,7 @@ class Configuration:
     """Configuration for a Direct Intake environment."""
     config = {}
     def __init__(self, is_supplemental: bool = None,
-                 extend_objects: list[str] = None) -> None:
+                 extend_objects: List[str] = None) -> None:
         self.config = {
             "job": {
                 "supplementalMode": self._to_supplemental(is_supplemental),
@@ -44,7 +45,7 @@ class Configuration:
             return "IS_SUPPLEMENTAL"
         return "IS_PRIMARY"
 
-    def _to_list(self, extend_objects: list[str]) -> list[str]:
+    def _to_list(self, extend_objects: List[str]) -> List[str]:
         if extend_objects is None:
             return []
         return extend_objects
