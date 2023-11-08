@@ -209,6 +209,20 @@ with VisierSession(auth) as s:
     print(df_list.head)
 ```
 
+### Snapshot Query
+Snapshot is similar `list` API in terms of the structure and granularity of the query result. A Snapshot query can be thought of as a sequence of `list` queries executed at specified times. The Snapshot result can be augmented with a property named `effectiveDateProperty` to include the time of each snapshot. See the referenced sample JSON query definition for how to do this.
+```python
+with VisierSession(auth) as s:
+    client = QueryApiClient(s)
+    # Snapshot query from JSON query definition
+    snapshot_query = load_json("snapshot/employee-info.json")
+    snapshot_result = client.snapshot(snapshot_query)
+    df_snapshot = pd.DataFrame.from_records(data=snapshot_result.rows(), columns=snapshot_result.header)
+
+    # ...
+    print(df_snapshot.head)
+```
+
 ### Aggregate Query
 Aggregate queries execute queries using Visier metrics. A metric is a business question or concern that is quantifiable as a number. Visier metrics range from simple metrics like `employeeCount` to more complex metrics like `hrRecruitingBudgetedLaborCostPerFTE`. In this example, we define a query to aggregate `applicantCount` by `Application_Source` and `Applicant_Stage`.
 
