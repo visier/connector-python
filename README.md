@@ -210,7 +210,9 @@ with VisierSession(auth) as s:
 ```
 
 ### Snapshot Query
-Snapshot is similar `list` API in terms of the structure and granularity of the query result. A Snapshot query can be thought of as a sequence of `list` queries executed at specified times. The Snapshot result can be augmented with a property named `effectiveDateProperty` to include the time of each snapshot. See the referenced sample JSON query definition for how to do this.
+Snapshot queries retrieve a collection of `list` query-style snapshots taken at the defined intervals. A `snapshot` query's structure and result granularity is similar to a `list` query. You can think of a `snapshot` query as a sequence of `list` queries executed at specific times.
+
+You can augment the `snapshot` result with the `effectiveDateProperty` property to include the time of each snapshot. For more information about using the `effectiveDateProperty` property, see the referenced sample JSON [query definition](/examples/snapshot/employee-info.json).
 ```python
 with VisierSession(auth) as s:
     client = QueryApiClient(s)
