@@ -32,6 +32,10 @@ class QueryApiClient(ApiClientBase):
         """Execute a Visier list query and return a tabular result."""
         return self._execute_query_api("/v1/data/query/list", query_def)
 
+    def snapshot(self, query_def: object):
+        """Execute a Visier snapshot query and return a tabular result."""
+        return self._execute_query_api("/v1/data/query/snapshot", query_def)
+
     def sqllike(self, sql_query: str, options = None):
         """Execute a Visier SQL-like query statement and return a tabular result."""
         body = {"query" : sql_query}

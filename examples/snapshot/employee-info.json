@@ -1,0 +1,52 @@
+{
+    "source": {
+      "metric": "employeeCount"
+    },
+    "columns": [
+      {
+        "columnDefinition": {
+          "property": {
+            "name": "Employee.Age",
+            "qualifyingPath": "Employee"
+          }
+        }
+      },
+      {
+        "columnDefinition": {
+          "property": {
+            "name": "Employee.Start_Date",
+            "qualifyingPath": "Employee"
+          }
+        }
+      },
+      {
+        "columnDefinition": {
+          "property": {
+            "name": "Employee.Market_Compensation_Ratio",
+            "qualifyingPath": "Employee"
+          }
+        }
+      },
+      {
+        "columnDefinition": {
+          "property": {
+            "name": "Employee.Full_Name",
+            "qualifyingPath": "Employee"
+          }
+        }
+      },
+      {
+        "columnName": "Effective time",
+        "columnDefinition": {
+          "effectiveDateProperty": {}
+        }
+      }
+    ],
+    "timeIntervals": {
+      "fromDateTime": "2022-01-01",
+      "intervalPeriodType": "MONTH",
+      "intervalPeriodCount": 6,
+      "intervalCount": 4
+    }
+  }
+  
