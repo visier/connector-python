@@ -16,17 +16,19 @@
 Visier Session object through which JSON as well as SQL-like queries are executed.
 """
 
-import os
 from typing import Callable
 import webbrowser
 from queue import Empty
-import urllib.parse
+from urllib.parse import urlencode, quote
+import secrets
+import hashlib
+import base64
 import requests
 from requests import Session, Response
 from deprecated import deprecated
 from .table import ResultTable
 from .authentication import Authentication, OAuth2, Basic
-from .constants import TARGET_TENANT_ID, ENV_VISIER_OAUTH_CALLBACK_URL
+from .constants import TARGET_TENANT_ID
 from .callback import CallbackServer, CallbackBinding
 
 
@@ -98,7 +100,7 @@ class VisierSession:
     def __init__(self, auth: Authentication) -> None:
         self._auth = auth
         self._session = None
-        self._timeout = 30
+        self._timeout = 300
 
     @deprecated(version="0.9.5", reason="Use visier.api.QueryApiClient instead")
     def execute_aggregate(self, query_def: object):
@@ -197,7 +199,7 @@ class VisierSession:
     def _request_token(self, auth: OAuth2, body: dict) -> str:
         def get_client_auth():
             if auth.client_id and auth.client_secret:
-                return (auth.client_id, urllib.parse.quote(auth.client_secret, safe=''))
+                return (auth.client_id, quote(auth.client_secret, safe=''))
             return None
 
         url = auth.host + "/v1/auth/oauth2/token"
@@ -218,31 +220,43 @@ class VisierSession:
         """Connect to Visier using (three-legged) OAuth2.
         This method will attempt to open a browser for the authentication and consent screens.
         It will also spin up a local web server to receive the OAuth2 authorization code."""
-        url_prefix = auth.host + "/v1/auth/oauth2"
+        def mk_pkce_pair():
+            code_verifier = secrets.token_urlsafe(64)
+            code_challenge_digest = hashlib.sha256(code_verifier.encode()).digest()
+            code_challenge = base64.urlsafe_b64encode(code_challenge_digest).decode().rstrip("=")
+            return code_verifier, code_challenge
 
-        def get_token(code: str) -> str:
+        def get_token(code: str, code_verifier: str) -> str:
             body = {
                 "grant_type": "authorization_code",
                 "client_id": auth.client_id,
                 "scope": "read",
-                "code": code
+                "code": code,
+                "code_verifier": code_verifier
             }
             return self._request_token(auth, body)
 
-        callback_url = os.getenv(ENV_VISIER_OAUTH_CALLBACK_URL)
-        binding = CallbackBinding(callback_url)
+        code_verifier, code_challenge = mk_pkce_pair()
+        url_prefix = auth.host + "/v1/auth/oauth2"
+        binding = CallbackBinding(auth.redirect_uri)
         with CallbackServer(binding) as svr:
+            query_args = {
+                "apikey": auth.api_key,
+                "response_type": "code",
+                "client_id": auth.client_id,
+                "code_challenge_method": "S256",
+                "code_challenge": code_challenge
+            }
             if auth.redirect_uri:
-                redirect_uri_arg = f"&redirect_uri={urllib.parse.quote(auth.redirect_uri, safe='')}"
-            else:
-                redirect_uri_arg = "" # Empty means use the redirect_uri registered with Visier
-            browser_url = f'{url_prefix}/authorize?apikey={auth.api_key}&response_type=code&client_id={auth.client_id}{redirect_uri_arg}'
+                query_args["redirect_uri"] = auth.redirect_uri
+
+            browser_url = f'{url_prefix}/authorize?{urlencode(query_args)}'
             # Launch the browser for authentication and consent screens
             webbrowser.open(browser_url)
             try:
                 # Wait up to 2 minutes for the user to complete the OAuth2 code flow
                 code = svr.queue.get(block=True, timeout=120)
-                self._update_session(get_token(code), auth.api_key)
+                self._update_session(get_token(code, code_verifier), auth.api_key)
             except Empty as empty:
                 raise OAuthConnectError("Timed out waiting for OAuth2 auth code") from empty
 
