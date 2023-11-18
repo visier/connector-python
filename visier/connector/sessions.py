@@ -100,7 +100,8 @@ class VisierSession:
     def __init__(self, auth: Authentication) -> None:
         self._auth = auth
         self._session = None
-        self._timeout = 300
+        self._timeout = 30 # timeout in seconds for individual requests
+        self._auth_code_flow_timeout = 120 # timeout in seconds for the OAuth2 authorization code flow
 
     @deprecated(version="0.9.5", reason="Use visier.api.QueryApiClient instead")
     def execute_aggregate(self, query_def: object):
@@ -221,6 +222,7 @@ class VisierSession:
         This method will attempt to open a browser for the authentication and consent screens.
         It will also spin up a local web server to receive the OAuth2 authorization code."""
         def mk_pkce_pair():
+            """"Generate a PKCE code verifier and challenge pair"""
             code_verifier = secrets.token_urlsafe(64)
             code_challenge_digest = hashlib.sha256(code_verifier.encode()).digest()
             code_challenge = base64.urlsafe_b64encode(code_challenge_digest).decode().rstrip("=")
@@ -255,7 +257,7 @@ class VisierSession:
             webbrowser.open(browser_url)
             try:
                 # Wait up to 2 minutes for the user to complete the OAuth2 code flow
-                code = svr.queue.get(block=True, timeout=120)
+                code = svr.queue.get(block=True, timeout=self._auth_code_flow_timeout)
                 self._update_session(get_token(code, code_verifier), auth.api_key)
             except Empty as empty:
                 raise OAuthConnectError("Timed out waiting for OAuth2 auth code") from empty
