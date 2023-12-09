@@ -140,8 +140,6 @@ class VisierSession:
                     self._connect()
                 else:
                     raise QueryExecutionError(result.status_code, result.text)
-        if result.status_code == 204:
-            return None
         return result
 
     def __enter__(self):
