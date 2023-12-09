@@ -140,6 +140,8 @@ class VisierSession:
                     self._connect()
                 else:
                     raise QueryExecutionError(result.status_code, result.text)
+        if result.status_code == 204:
+            return None
         return result
 
     def __enter__(self):
@@ -185,6 +187,8 @@ class VisierSession:
         if auth.vanity:
             body["vanityName"] = auth.vanity
         result = requests.post(url=url, data=body, timeout=self._timeout)
+        if result.status_code == 500 and not auth.vanity:
+            raise QueryExecutionError(result.status_code, "Vanity name is required for logging on to this tenant")
         result.raise_for_status()
         # Only create a requests.Session once we have a Visier ASID Token
         update_session(result.text)

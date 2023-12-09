@@ -15,8 +15,10 @@
 """
 API client for the Visier Data Intake API.
 """
+from os.path import basename
 from typing import List
 from urllib.parse import urlencode
+from mimetypes import guess_type
 from requests import Response
 from visier.connector import SessionContext
 from .base import ApiClientBase
@@ -61,7 +63,7 @@ class DataIntakeApiClient(ApiClientBase):
             if tenant_code:
                 arguments["tenantCode"] = tenant_code
             url = context.mk_url(f"{BASE_PATH}/data-transfer-sessions/{transfer_session_id}/add?{urlencode(arguments)}")
-            return context.session().put(url, data=source_data, headers=context.mk_headers())
+            return context.session().put(url, json=source_data, headers=context.mk_headers())
         return self.run(call_impl)
 
     def upload_file(self, transfer_session_id: str, source_id: str, payload_file_path: str,
@@ -84,11 +86,14 @@ class DataIntakeApiClient(ApiClientBase):
                 arguments["tenantCode"] = tenant_code
             url = context.mk_url(f"{BASE_PATH}/data-transfer-sessions/{transfer_session_id}/upload?{urlencode(arguments)}")
             with open(payload_file_path, "rb") as payload_file:
-                files = {"file": payload_file}
-            return context.session().put(url, files=files, headers=context.mk_headers())
+                filename = basename(payload_file.name)
+                mimetype, _ = guess_type(filename)
+                mimetype = mimetype or "application/octet-stream"
+                files = {"file": (filename, payload_file, mimetype)}
+                return context.session().put(url, files=files, headers=context.mk_headers())
         return self.run(call_impl)
 
-    def complete_transfer(self, transfer_session_id: str, process_data: bool) -> Response:
+    def complete_transfer(self, transfer_session_id: str, process_data: bool = False) -> Response:
         """Complete a transfer session by triggering a receiving job. A
         receiving job validates the transferred data and adds the transferred data to Visier's data store.
         You can set an optional parameter to generate a data version through a processing job immediately
@@ -96,7 +101,7 @@ class DataIntakeApiClient(ApiClientBase):
         
         Arguments:
         - transfer_session_id: The id of the transfer session returned by start_transfer
-        - process_data: Whether to trigger a processing job after the receiving job completes"""
+        - process_data: Whether to trigger a processing job after the receiving job completes. Default value is False"""
         def call_impl(context: SessionContext) -> Response:
             body = {
                 "transferSessionId": transfer_session_id,

@@ -19,3 +19,4 @@ Visier API Bindings that enable calling the Visier APIs through the VisierSessio
 from .model import ModelApiClient
 from .query import QueryApiClient
 from .direct_intake import DirectIntakeApiClient
+from .intake import DataIntakeApiClient
