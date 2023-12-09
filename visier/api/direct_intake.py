@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-API client for the Visier Direct Intake API.
+API client for the Visier Direct Data Intake API.
 """
 
 import dataclasses
@@ -27,7 +27,7 @@ BASE_PATH = f"/v1/data/directloads/{DRAFT_ID}"
 
 @dataclasses.dataclass
 class Configuration:
-    """Configuration for a Direct Intake environment."""
+    """Configuration for a Direct Data Intake environment."""
     config = {}
     def __init__(self, is_supplemental: bool = None,
                  extend_objects: List[str] = None) -> None:
@@ -52,7 +52,7 @@ class Configuration:
 
 
 class DirectIntakeApiClient(ApiClientBase):
-    """API client for the Visier Direct Intake API."""
+    """API client for the Visier Direct Data Intake API."""
 
     def get_configuration(self) -> Response:
         """Get the configuration for the the direct intake environment."""

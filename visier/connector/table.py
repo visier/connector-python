@@ -35,9 +35,12 @@ class ResultTable:
     header = []
 
     def __init__(self, gen_f) -> None:
-        self.header = json.loads(next(gen_f))
-        self._generator = gen_f
-
+        try:
+            self.header = json.loads(next(gen_f))
+            self._generator = gen_f
+        except StopIteration:
+            self.header = []
+            self._generator = []
 
     def rows(self):
         """Returns a row tuple generator"""
