@@ -28,7 +28,7 @@ from requests import Session, Response
 from deprecated import deprecated
 from .table import ResultTable
 from .authentication import Authentication, OAuth2, Basic
-from .constants import TARGET_TENANT_ID
+from .constants import TARGET_TENANT_ID, USER_AGENT, USER_AGENT_VALUE
 from .callback import CallbackServer, CallbackBinding
 
 
@@ -71,6 +71,8 @@ class SessionContext:
         self._session = session
         self._host = host
         self._target_tenant_id = target_tenant_id
+        # Set the User-Agent header for internal tracking purposes
+        self._session.headers.update({USER_AGENT: USER_AGENT_VALUE})
 
     def session(self) -> Session:
         """Returns the current session object"""
@@ -212,7 +214,7 @@ class VisierSession:
             body["redirect_uri"] = auth.redirect_uri
         response = requests.post(url=url,
                                  data=body,
-                                 headers={"apikey": auth.api_key},
+                                 headers={"apikey": auth.api_key, USER_AGENT: USER_AGENT_VALUE},
                                  timeout=self._timeout,
                                  auth=get_client_auth())
         response.raise_for_status()
