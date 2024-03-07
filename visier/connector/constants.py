@@ -16,9 +16,11 @@
 Visier Public Python Connector Constants
 """
 
+from visier import __version__
+
 TARGET_TENANT_ID="TargetTenantID"
 USER_AGENT="User-Agent"
-USER_AGENT_VALUE="visier-python-connector"
+USER_AGENT_VALUE="visier-python-connector/" + __version__
 
 ENV_VISIER_USERNAME="VISIER_USERNAME"
 ENV_VISIER_PASSWORD="VISIER_PASSWORD"
