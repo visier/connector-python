@@ -61,7 +61,7 @@ class DVExportApiClient(ApiClientBase):
 
     def get_data_versions_available_for_export(self) -> Response:
         def call_impl(context: SessionContext) -> Response:
-            url = context.mk_url(f"{BASE_PATH}/availableDataVersions")
+            url = context.mk_url(f"{BASE_PATH}/data-versions")
             return context.session().get(url, headers=context.mk_headers())
 
         return self.run(call_impl)
