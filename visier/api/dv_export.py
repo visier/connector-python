@@ -75,8 +75,8 @@ class DVExportApiClient(ApiClientBase):
             return context.session().get(url, headers=context.mk_headers())
         return self.run(call_impl)
 
-    def get_export_file(self, export_id: str, file_id: str) -> Response:
+    def get_export_file(self, export_id: str, file_id: str, stream=False) -> Response:
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/exports/{export_id}/files/{file_id}")
-            return context.session().get(url, headers=context.mk_headers())
+            return context.session().get(url, headers=context.mk_headers(), stream=stream)
         return self.run(call_impl)
