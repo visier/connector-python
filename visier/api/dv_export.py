@@ -23,7 +23,7 @@ import json
 BASE_PATH = "/v1alpha/data/data-version-exports"
 
 class DVExportApiClient(ApiClientBase):
-    """API client for the Visier DV Export API."""
+    """API client for the Visier Data Version Export API."""
 
     def schedule_initial_data_version_export_job(self, data_version_number: int) -> Response:
         def call_impl(context: SessionContext) -> Response:
@@ -39,7 +39,10 @@ class DVExportApiClient(ApiClientBase):
                                                base_data_version_number: int) -> Response:
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/jobs")
-            payload = {'dataVersionNumber': str(data_version_number), 'baseDataVersionNumber': str(base_data_version_number)}
+            payload = {
+                'dataVersionNumber': str(data_version_number),
+                'baseDataVersionNumber': str(base_data_version_number)
+            }
             headers = context.mk_headers()
             headers['Content-Type'] = "application/json"
             return context.session().post(url, headers=headers, data=json.dumps(payload))
