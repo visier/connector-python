@@ -28,7 +28,7 @@ class DVExportApiClient(ApiClientBase):
     def schedule_initial_data_version_export_job(self, data_version_number: int) -> Response:
         """
         Schedule an initial data version export job. An initial data version export job should be run if you are
-        trying to create an initial data store for the data version export, as the metadata, retrieved via
+        trying to create an initial data store for the data version export, as the metadata retrieved via
         `get_dava_version_export_metadata` will contain all the required information to create new tables.
         :param data_version_number: The DV number you want to export
         """
@@ -85,7 +85,7 @@ class DVExportApiClient(ApiClientBase):
 
     def get_data_versions_available_for_export(self) -> Response:
         """
-        Returns a list of all data version numbers which are available to run an export job on.
+        Returns a list of metadata for all data versions which are available to run an export job on.
         """
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/data-versions")
@@ -105,8 +105,8 @@ class DVExportApiClient(ApiClientBase):
     def get_export_file(self, export_id: str, file_id: str, stream=False) -> Response:
         """
         Get a single file with ID ``file_id`` for specific data version export with ID ``export_id``. The file is
-        gz compressed on the server. Leaving ``stream=False`` will automatically decode the file as it is downloaded.
-        Set ``stream=True`` if you would like to download the compressed file as raw bytes and decode it later.
+        gz compressed on the server. Leaving ``stream=False`` will let you automatically decode the file as it is
+        downloaded. Set ``stream=True`` if you would like to download the compressed file as raw bytes and decode it later.
         :param export_id: The ID of the export job the file is a part of
         :param file_id: The ID of the file within the ``export_id`` to download
         :param stream: Boolean to pass to underlying ``Requests`` call. Set to ``True`` if you want to access raw bytes.
