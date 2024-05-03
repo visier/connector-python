@@ -343,5 +343,86 @@ with VisierSession(auth) as s:
     print(levels.json())
 ```
 
+## Data Version Export API
+Data Version (DV) Export API allows users to export DV data in a CSV format.
+
+To use the connector, add the following statement to your program.
+```python
+from visier.api import DVExportApiClient
+```
+
+### Schedule a DV export job
+Use the client to schedule a DV export job, poll its status until completion to retrieve the export ID, then get the 
+export metadata.
+```python
+with VisierSession(auth) as s:
+    dv_export_client = DVExportApiClient(s)
+
+    if is_initial_export:
+        schedule_response = dv_export_client.schedule_initial_data_version_export_job(12345)
+    else:
+        schedule_response = dv_export_client.schedule_delta_data_version_export_job(12345, 67890)
+
+    job_id = schedule_response.json()['jobUuid']
+    print(f"DV Export job scheduled with job_id={job_id}")
+
+    while True:
+        print(f"Checking for completion of job_id={job_id}")
+        poll_response = dv_export_client.get_data_version_export_job_status(job_id)
+
+        poll_response_json = poll_response.json()
+        if poll_response_json['completed']:
+            export_id = poll_response_json['exportUuid']
+            print(f"job_id={job_id} complete with export_id={export_id}")
+            break
+        else:
+            poll_interval = 5
+            print(f"Checking job_id={job_id} status in {poll_interval} seconds")
+            time.sleep(poll_interval)
+
+    export_metadata_response = dv_export_client.get_data_version_export_metadata(export_id)
+    print(f"Retrieved export metadata: {export_metadata_response.json()}")
+```
+
+### Get data file from export
+Once you have completed a DV export job, you should use the returned export ID to retrieve metadata about the different tables 
+in the data version as well as files for those tables.
+#### Decompress file during download
+```python
+    with dv_export_client.get_export_file(export_id, file_id) as r:
+        with open(full_file_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=None):
+                if chunk:
+                    f.write(chunk)
+```
+
+#### Download as compressed file
+Set `stream=True` if you would like to avoid decompressing the file on download. 
+```python
+    with dv_export_client.get_export_file(export_id, file_id, stream=True) as r:
+        with open(full_file_path, 'wb') as f:
+            for chunk in r.raw.stream(1024, decode_content=False):
+                if chunk:
+                    f.write(chunk)
+```
+
+### Get data versions available for export
+Use this method to see which data versions you can run an export job on.
+```python
+    dv_response = dv_export_client.get_data_versions_available_for_export()
+    print(f"Retrieved available data versions:  {dv_response.json()}")
+```
+
+### Get completed exports
+Use this method to see the export metadata from DV export jobs which have already completed.
+```python
+    exports_response = dv_export_client.get_available_data_version_exports()
+    print(f"Full metadata for all DV exports retrieved: {exports_response.json()}")
+```
+
+### More examples
+For a more complex script example which shows how the DV Export API client can be used to export a DV into a database, see 
+[github.com/visier/api-samples](https://github.com/visier/api-samples).
+
 ## Installation
 Add `visier-connector` as a dependency to your module or install `pip install -U visier-connector` directly.
