@@ -106,7 +106,7 @@ class DVExportApiClient(ApiClientBase):
         """
         Get a single file with ID ``file_id`` for specific data version export with ID ``export_id``. The file is
         gz compressed on the server. Leaving ``stream=False`` will automatically decode the file as it is downloaded.
-        Set ``stream=True`` if you would to download the compressed file as raw bytes and decode it later.
+        Set ``stream=True`` if you would like to download the compressed file as raw bytes and decode it later.
         :param export_id: The ID of the export job the file is a part of
         :param file_id: The ID of the file within the ``export_id`` to download
         :param stream: Boolean to pass to underlying ``Requests`` call. Set to ``True`` if you want to access raw bytes.
