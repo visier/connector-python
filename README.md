@@ -344,16 +344,16 @@ with VisierSession(auth) as s:
 ```
 
 ## Data Version Export API
-Data Version (DV) Export API allows users to export DV data in a CSV format.
+The Data Version (DV) Export API allows users to export data version information, such as tables, columns, and file information, in CSV format.
 
 To use the connector, add the following statement to your program.
 ```python
 from visier.api import DVExportApiClient
 ```
 
-### Schedule a DV export job
-Use the client to schedule a DV export job, poll its status until completion to retrieve the export ID, then get the 
-export metadata.
+### Schedule a Data Version Export Job
+Use the client to schedule a DV export job, poll the job's status until completion to retrieve the export ID, then get the 
+export information.
 ```python
 with VisierSession(auth) as s:
     dv_export_client = DVExportApiClient(s)
@@ -384,10 +384,11 @@ with VisierSession(auth) as s:
     print(f"Retrieved export metadata: {export_metadata_response.json()}")
 ```
 
-### Get data file from export
-Once you have completed a DV export job, you should use the returned export ID to retrieve metadata about the different tables 
-in the data version as well as files for those tables.
-#### Decompress file during download
+### Download a File From A Data Version Export
+After the DV export job completes, you can use the returned export ID to retrieve information about the tables 
+in the data version and data files for the tables. Then, use the file ID to download a specific table from the data version export. The file contains DV records for
+a particular table's columns; for example, the columns in the Employee table.
+#### Decompress File During Download
 ```python
     with dv_export_client.get_export_file(export_id, file_id) as r:
         with open(full_file_path, 'wb') as f:
@@ -396,8 +397,8 @@ in the data version as well as files for those tables.
                     f.write(chunk)
 ```
 
-#### Download as compressed file
-Set `stream=True` if you would like to avoid decompressing the file on download. 
+#### Download as Compressed File (Optional)
+To avoid decompressing the file during download, set `stream=True`. 
 ```python
     with dv_export_client.get_export_file(export_id, file_id, stream=True) as r:
         with open(full_file_path, 'wb') as f:
@@ -406,22 +407,22 @@ Set `stream=True` if you would like to avoid decompressing the file on download.
                     f.write(chunk)
 ```
 
-### Get data versions available for export
-Use this method to see which data versions you can run an export job on.
+### Retrieve a List of All Data Versions
+Use this method to get the available data versions that you can export.
 ```python
     dv_response = dv_export_client.get_data_versions_available_for_export()
     print(f"Retrieved available data versions:  {dv_response.json()}")
 ```
 
-### Get completed exports
-Use this method to see the export metadata from DV export jobs which have already completed.
+### Retrieve the Details of All Data Version Exports
+Use this method to get the export information for all completed export jobs.
 ```python
     exports_response = dv_export_client.get_available_data_version_exports()
     print(f"Full metadata for all DV exports retrieved: {exports_response.json()}")
 ```
 
-### More examples
-For a more complex script example which shows how the DV Export API client can be used to export a DV into a database, see 
+### More Examples
+For a script example that shows how the Data Version Export API client can export a data version into a database, see 
 [github.com/visier/api-samples](https://github.com/visier/api-samples).
 
 ## Installation
