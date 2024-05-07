@@ -27,10 +27,10 @@ class DVExportApiClient(ApiClientBase):
 
     def schedule_initial_data_version_export_job(self, data_version_number: int) -> Response:
         """
-        Schedule an initial data version export job. An initial data version export job should be run if you are
-        trying to create an initial data store for the data version export, as the metadata retrieved via
-        `get_dava_version_export_metadata` will contain all the required information to create new tables.
-        :param data_version_number: The DV number you want to export
+        Schedule an initial data version export job. You might want to run an initial data version export job if you are
+        creating an initial data store for the data version export. The information returned through
+        `get_data_version_export_metadata` contains all the required details to create new tables.
+        :param data_version_number: The DV number you want to export.
         """
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/jobs")
@@ -44,11 +44,11 @@ class DVExportApiClient(ApiClientBase):
                                                data_version_number: int,
                                                base_data_version_number: int) -> Response:
         """
-        Schedule a delta data version export job. A delta data version export job should be run if have already
-        exported an initial data version and want to export the changes in data between ``data_version_number``
+        Schedule a delta data version export job. Run a delta data version export job if you already
+        exported an initial data version and want to export the changes between ``data_version_number``
         and ``base_data_version_number``.
-        :param data_version_number: Data version number to export
-        :param base_data_version_number: Data version number to compute diff from
+        :param data_version_number: The data version number to export.
+        :param base_data_version_number: The data version number to compare against.
         """
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/jobs")
@@ -63,7 +63,7 @@ class DVExportApiClient(ApiClientBase):
 
     def get_data_version_export_job_status(self, job_id: str) -> Response:
         """
-        Check the status of a DV export job. ``job_id`` can be retrieved from the response returned by
+        Check the status of a data version export job. Retrieve ``job_id`` from the response returned by
         ``schedule_initial_data_version_export_job`` or  ``schedule_delta_data_version_export_job``.
         :param job_id: The job ID of a scheduled DV export job.
         """
@@ -74,7 +74,7 @@ class DVExportApiClient(ApiClientBase):
 
     def get_data_version_export_metadata(self, export_id: str):
         """
-        After the DV export job has completed, get the DV export metadata. The ``export_id`` can be retrieved
+        After the DV export job completes, get the DV export details. Retrieve ``export_id``
         from the response returned by ``get_data_version_export_job_status``.
         :param export_id: The export ID of the completed DV export job.
         """
@@ -85,7 +85,7 @@ class DVExportApiClient(ApiClientBase):
 
     def get_data_versions_available_for_export(self) -> Response:
         """
-        Returns a list of metadata for all data versions which are available to run an export job on.
+        Returns details for all data versions on which you can run a DV export job.
         """
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/data-versions")
@@ -94,8 +94,7 @@ class DVExportApiClient(ApiClientBase):
 
     def get_available_data_version_exports(self) -> Response:
         """
-        Returns a list of export metadata for all data version export jobs that have successfully run for this tenant
-        that haven't expired.
+        Returns a list of all available data version exports. Data version exports are available for 14 days after export job completes.
         """
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/exports")
@@ -104,13 +103,13 @@ class DVExportApiClient(ApiClientBase):
 
     def get_export_file(self, export_id: str, file_id: str, stream=False) -> Response:
         """
-        Get a single file with ID ``file_id`` for specific data version export with ID ``export_id``. The file is
-        gz compressed on the server. Leaving ``stream=False`` will let you automatically decode the file as it is
-        downloaded. Set ``stream=True`` if you would like to download the compressed file as raw bytes and decode it later.
-        :param export_id: The ID of the export job the file is a part of
-        :param file_id: The ID of the file within the ``export_id`` to download
-        :param stream: Boolean to pass to underlying ``Requests`` call. Set to ``True`` if you want to access raw bytes.
-            The default value is ``False``.
+        Download a file with ID ``file_id`` for specific data version export with ID ``export_id``. The file is
+        gz compressed on the server. The default ``stream=False`` lets you automatically decode the file during
+        download. Set ``stream=True`` to download the compressed file as raw bytes to decode later.
+        :param export_id: The ID of the export job that contains the file.
+        :param file_id: The ID of the file within the ``export_id`` to download.
+        :param stream: Boolean to pass to underlying ``Requests`` call. If ``True``, gives access raw bytes.
+            The default is ``False``.
         """
         def call_impl(context: SessionContext) -> Response:
             url = context.mk_url(f"{BASE_PATH}/exports/{export_id}/files/{file_id}")
