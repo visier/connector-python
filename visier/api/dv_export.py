@@ -108,7 +108,7 @@ class DVExportApiClient(ApiClientBase):
         download. Set ``stream=True`` to download the compressed file as raw bytes to decode later.
         :param export_id: The ID of the export job that contains the file.
         :param file_id: The ID of the file within the ``export_id`` to download.
-        :param stream: Boolean to pass to underlying ``Requests`` call. If ``True``, gives access raw bytes.
+        :param stream: Boolean to pass to underlying ``Requests`` call. If ``True``, gives access to raw bytes.
             The default is ``False``.
         """
         def call_impl(context: SessionContext) -> Response:

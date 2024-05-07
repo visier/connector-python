@@ -384,7 +384,7 @@ with VisierSession(auth) as s:
     print(f"Retrieved export metadata: {export_metadata_response.json()}")
 ```
 
-### Download a File From A Data Version Export
+### Download a File From a Data Version Export
 After the DV export job completes, you can use the returned export ID to retrieve information about the tables 
 in the data version and data files for the tables. Then, use the file ID to download a specific table from the data version export. The file contains DV records for
 a particular table's columns; for example, the columns in the Employee table.
