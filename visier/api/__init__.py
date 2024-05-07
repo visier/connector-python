@@ -20,3 +20,4 @@ from .model import ModelApiClient
 from .query import QueryApiClient
 from .direct_intake import DirectIntakeApiClient
 from .intake import DataIntakeApiClient
+from .dv_export import DVExportApiClient
