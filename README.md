@@ -344,7 +344,7 @@ with VisierSession(auth) as s:
 ```
 
 ## Data Version Export API
-The Data Version (DV) Export API allows users to export data version information, such as tables, columns, and file information, in CSV format.
+The Data Version (DV) Export API allows users to export data version information, such as tables, columns, and file information, in CSV format. For more information, see [Data Version Export API](https://docs.visier.com/developer/apis/data-out/data-version-export/data-version-export-api.htm).
 
 To use the connector, add the following statement to your program.
 ```python
@@ -423,7 +423,7 @@ Use this method to get the export information for all completed export jobs.
 
 ### More Examples
 For a script example that shows how the Data Version Export API client can export a data version into a database, see 
-[github.com/visier/api-samples](https://github.com/visier/api-samples).
+[Visier API samples](https://github.com/visier/api-samples).
 
 ## Installation
 Add `visier-connector` as a dependency to your module or install `pip install -U visier-connector` directly.
