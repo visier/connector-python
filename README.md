@@ -4,8 +4,8 @@ The Visier Python Connector allows Python developers to query against the Visier
 
 ## Prerequisites
 This connector acts as a bridge between your Python application and Visier's cloud-hosted service infrastructure. To successfully connect to your Visier data, you need:
-* The URL domain name prefix. For example: `https://{vanity-name}.api.visier.io`. To find your vanity name:
-  1. In Visier, in the global workspace, click **Settings > Single Sign-On** or **Partner Single Sign-On**.
+* The URL domain name prefix with the following pattern: `https://{vanity-name}.api.visier.io`. To find your vanity name:
+  1. In Visier, in the global workspace, click **Settings**, then click **Single Sign-On** or **Partner Single Sign-On**.
   2. Under **Single Sign-On** or **Bypass Users (Optional)**, find your service provider endpoint; for example, `https://jupiter.visier.com/VServer/auth`. In this example, `jupiter` is the vanity name.
 * An API key issued by Visier.
 * One of:
