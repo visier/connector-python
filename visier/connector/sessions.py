@@ -116,11 +116,13 @@ class VisierSession:
         return self._execute_query_api("/v1/data/query/list", query_def)
 
     @deprecated(version="0.9.5", reason="Use visier.api.QueryApiClient instead")
-    def execute_sqllike(self, sql_query: str, options = None):
+    def execute_sqllike(self, sql_query: str, aggregate_query_options = None, list_query_options = None):
         """Execute a Visier SQL-like query statement and return a tabular result."""
         body = {"query" : sql_query}
-        if options:
-            body["options"] = options
+        if aggregate_query_options:
+            body["aggregateQueryOptions"] = aggregate_query_options
+        if list_query_options:
+            body["listQueryOptions"] = list_query_options
         return self._execute_query_api("/v1/data/query/sql", body)
 
     def execute(self, call_function: Callable[[SessionContext], Response]) -> Response:
