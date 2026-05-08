@@ -247,7 +247,7 @@ with VisierSession(auth) as s:
 You can write SQL-like queries to define both list and aggregate queries.
 
 #### SQL-Like List Query
-In this example, we define a snippet to get the `EmployeeID`, `Union_Status`, `Direct_Manager.Gender`, `Direct_Manager.Vaccination_Status` where `isFemale` = `TRUE` and `isHighPerformer` = `TRUE` between January 1, 2020 and December 31, 2021. In list SQL-like queries, you can use `list_query_options`, see [Visier documentation](https://docs.visier.com/developer/apis/references/api-reference.htm#tag/DataQuery/operation/DataQuery_SqlLike) for all available list options.
+In this example, we define a snippet to get the `EmployeeID`, `Union_Status`, `Direct_Manager.Gender`, `Direct_Manager.Vaccination_Status` where `isFemale` = `TRUE` and `isHighPerformer` = `TRUE` between January 1, 2020 and December 31, 2021. For more information about the available list options, see [Query aggregate or list data using SQL-like syntax](https://docs.visier.com/developer/apis/references/api-reference.htm#tag/DataQuery/operation/DataQuery_SqlLike).
 ```python
 with VisierSession(auth) as s:
     client = QueryApiClient(s)
@@ -261,7 +261,7 @@ with VisierSession(auth) as s:
 ```
 
 #### SQL-Like Aggregate Query
-In this example, we define a snippet to aggregate `employeeCount` by `Location_0`, `Gender`, `Union_Status`, and `Location_1` for 4 periods of 3 months each starting from April 1, 2020. In aggregate SQL-like queries, you can use `aggregate_query_options` to eliminate cells with zero and null values. This reduces the size of the overall result set to only include rows whose metric value is more than 0. See [Visier documentation](https://docs.visier.com/developer/apis/references/api-reference.htm#tag/DataQuery/operation/DataQuery_SqlLike) for all available aggregate options.
+In this example, we define a snippet to aggregate `employeeCount` by `Location_0`, `Gender`, `Union_Status`, and `Location_1` for 4 periods of 3 months each starting from April 1, 2020. In aggregate SQL-like queries, you can use `aggregate_query_options` to eliminate cells with zero and null values. This reduces the size of the overall result set to only include rows whose metric value is more than 0. For more information about the available aggregate options, see [Query aggregate or list data using SQL-like syntax](https://docs.visier.com/developer/apis/references/api-reference.htm#tag/DataQuery/operation/DataQuery_SqlLike).
 ```python
 with VisierSession(auth) as s:
     client = QueryApiClient(s)
