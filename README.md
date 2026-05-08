@@ -261,7 +261,7 @@ with VisierSession(auth) as s:
 ```
 
 #### SQL-Like Aggregate Query
-In this example, we define a snippet to aggregate `employeeCount` by `Location_0`, `Gender`, `Union_Status`, and `Location_1` for 4 periods of 3 months each starting from April 1, 2020. In aggregate SQL-like queries, you can use `options` to eliminate cells with zero and null values. This reduces the size of the overall result set to only include rows whose metric value is more than 0.
+In this example, we define a snippet to aggregate `employeeCount` by `Location_0`, `Gender`, `Union_Status`, and `Location_1` for 4 periods of 3 months each starting from April 1, 2020. In aggregate SQL-like queries, you can use `aggregateQueryOptions` to eliminate cells with zero and null values. This reduces the size of the overall result set to only include rows whose metric value is more than 0.
 ```python
 with VisierSession(auth) as s:
     client = QueryApiClient(s)
